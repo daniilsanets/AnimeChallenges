@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+    http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <include file="sql/001-create-media-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/002-create-user-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/003-create-badge-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/004-create-user-badge-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/005-create-quest-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/006-create-quest-participation-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/007-create-submission-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/008-create-submission-media-table.sql" relativeToChangelogFile="true"/>
+</databaseChangeLog>
