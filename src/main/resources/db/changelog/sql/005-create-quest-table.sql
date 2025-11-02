@@ -26,6 +26,13 @@ CREATE TABLE quest (
 ALTER TABLE quest
     ADD CONSTRAINT fk_quest_creator_uid
         FOREIGN KEY (creator_uid)
-            REFERENCES "user"(uid)
+            REFERENCES users(uid)
             ON DELETE SET NULL;
 --rollback ALTER TABLE quest DROP CONSTRAINT fk_quest_creator_uid;
+
+--changeset daniilsanets:005-6
+--comment Add range check on reward_point
+ALTER TABLE quest
+    ADD CONSTRAINT range_check_reward_points
+        CHECK ( reward_points >= 0 AND reward_points <= 10);
+--rollback ALTER TABLE quest DROP CONSTRAINT range_check_reward_points;

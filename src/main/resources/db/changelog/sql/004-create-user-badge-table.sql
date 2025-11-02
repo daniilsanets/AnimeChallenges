@@ -14,7 +14,7 @@ CREATE TABLE user_badge (
 ALTER TABLE user_badge
     ADD CONSTRAINT fk_user_badge_user_uid
         FOREIGN KEY (user_uid)
-            REFERENCES "user"(uid)
+            REFERENCES users(uid)
             ON DELETE CASCADE;
 --rollback ALTER TABLE user_badge DROP CONSTRAINT fk_user_badge_user_uid;
 

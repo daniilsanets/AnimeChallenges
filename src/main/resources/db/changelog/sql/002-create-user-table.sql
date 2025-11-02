@@ -7,7 +7,7 @@ CREATE TYPE user_roles AS ENUM ('GUEST','USER','ADMIN');
 
 --changeset daniilsanets:002-2
 --comment Create user table
-CREATE TABLE "user" (
+CREATE TABLE users (
                         uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                         email VARCHAR(320) UNIQUE NOT NULL,
                         username VARCHAR(100) UNIQUE NOT NULL,
@@ -20,13 +20,20 @@ CREATE TABLE "user" (
                         created_at TIMESTAMPTZ DEFAULT now(),
                         updated_at TIMESTAMPTZ DEFAULT now()
 );
---rollback DROP TABLE "user";
+--rollback DROP TABLE users;
 
 --changeset daniilsanets:002-3
 --comment Add foreign key to media table for avatar
-ALTER TABLE "user"
+ALTER TABLE users
     ADD CONSTRAINT fk_user_avatar_media_uid
         FOREIGN KEY (avatar_media_uid)
             REFERENCES media(uid)
             ON DELETE SET NULL;
---rollback ALTER TABLE "user" DROP CONSTRAINT fk_user_avatar_media_uid;
+--rollback ALTER TABLE users DROP CONSTRAINT fk_user_avatar_media_uid;
+
+--changeset daniilsanets:002-4
+--comment Add email validation:)
+ALTER TABLE users
+    ADD CONSTRAINT email_format_check
+        CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+--rollback ALTER TABLE users DROP CONSTRAINT email_format_check;

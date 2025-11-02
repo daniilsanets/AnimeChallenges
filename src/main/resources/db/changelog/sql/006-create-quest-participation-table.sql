@@ -24,7 +24,7 @@ CREATE TABLE quest_participation (
 ALTER TABLE quest_participation
     ADD CONSTRAINT fk_quest_participation_user_uid
         FOREIGN KEY (user_uid)
-            REFERENCES "user"(uid)
+            REFERENCES users(uid)
             ON DELETE CASCADE;
 --rollback ALTER TABLE quest_participation DROP CONSTRAINT fk_quest_participation_user_uid;
 
@@ -36,3 +36,10 @@ ALTER TABLE quest_participation
             REFERENCES quest(uid)
             ON DELETE CASCADE;
 --rollback ALTER TABLE quest_participation DROP CONSTRAINT fk_quest_participation_quest_uid;
+
+--changeset daniilsanets:006-4
+--comment Add positive check on score
+ALTER TABLE quest_participation
+    ADD CONSTRAINT positive_score_check
+        CHECK ( score > 0 );
+--rollback ALTER TABLE quest_participation DROP CONSTRAINT positive_score_check;
