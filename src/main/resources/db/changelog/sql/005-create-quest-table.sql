@@ -13,7 +13,7 @@ CREATE TABLE quest (
                        description TEXT NOT NULL,
                        difficulty quests_difficulty NOT NULL,
                        reward_points INT NOT NULL DEFAULT 0,
-                       max_attempts INT NULL,
+                       max_attempts INT,
                        creator_uid UUID,
                        is_active BOOLEAN DEFAULT TRUE,
                        created_at TIMESTAMPTZ DEFAULT NOW(),
