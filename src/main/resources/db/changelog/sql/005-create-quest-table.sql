@@ -30,9 +30,16 @@ ALTER TABLE quest
             ON DELETE SET NULL;
 --rollback ALTER TABLE quest DROP CONSTRAINT fk_quest_creator_uid;
 
---changeset daniilsanets:005-6
+--changeset daniilsanets:005-4
 --comment Add range check on reward_point
 ALTER TABLE quest
     ADD CONSTRAINT range_check_reward_points
         CHECK ( reward_points >= 0 AND reward_points <= 10);
 --rollback ALTER TABLE quest DROP CONSTRAINT range_check_reward_points;
+
+--changeset daniilsanets:005-5
+--comment Add validation on max_attempts
+ALTER TABLE quest
+    ADD CONSTRAINT range_check_max_attempts
+        CHECK ( max_attempts >= 0 AND max_attempts <= 5 );
+--rollback ALTER TABLE quest DROP CONSTRAINT range_check_max_attempts;
