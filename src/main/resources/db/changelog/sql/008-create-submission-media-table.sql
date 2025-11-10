@@ -3,10 +3,10 @@
 --changeset daniilsanets:008-1
 --comment Create submission_media table
 CREATE TABLE submission_media (
-                                  uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                   submission_uid UUID NOT NULL,
                                   media_uid UUID NOT NULL,
-                                  created_at TIMESTAMPTZ DEFAULT NOW()
+                                  created_at TIMESTAMPTZ DEFAULT NOW(),
+                                  PRIMARY KEY (submission_uid, media_uid)
 );
 --rollback DROP TABLE submission_media;
 

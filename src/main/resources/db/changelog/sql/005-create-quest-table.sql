@@ -14,7 +14,7 @@ CREATE TABLE quest (
                        difficulty quests_difficulty NOT NULL,
                        reward_points INT NOT NULL DEFAULT 0,
                        max_attempts INT NOT NULL,
-                       creator_uid UUID,
+                       creator_uid UUID NOT NULL,
                        is_active BOOLEAN DEFAULT TRUE,
                        created_at TIMESTAMPTZ DEFAULT NOW(),
                        updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -41,5 +41,5 @@ ALTER TABLE quest
 --comment Add validation on max_attempts
 ALTER TABLE quest
     ADD CONSTRAINT range_check_max_attempts
-        CHECK ( max_attempts >= 0 AND max_attempts <= 5 );
+        CHECK ( max_attempts > 0 AND max_attempts <= 5 );
 --rollback ALTER TABLE quest DROP CONSTRAINT range_check_max_attempts;
