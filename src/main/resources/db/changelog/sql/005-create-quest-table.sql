@@ -14,7 +14,7 @@ CREATE TABLE quest (
                        difficulty quests_difficulty NOT NULL,
                        reward_points INT NOT NULL DEFAULT 0,
                        max_attempts INT NOT NULL,
-                       creator_uid UUID,
+                       creator_uid UUID NOT NULL,
                        is_active BOOLEAN DEFAULT TRUE,
                        created_at TIMESTAMPTZ DEFAULT NOW(),
                        updated_at TIMESTAMPTZ DEFAULT NOW()

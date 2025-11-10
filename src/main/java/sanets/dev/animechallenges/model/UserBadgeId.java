@@ -3,12 +3,11 @@ package sanets.dev.animechallenges.model;
 import java.io.Serializable;
 import java.util.UUID;
 
-import jakarta.persistence.IdClass;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-// Класс, описывающий композитный ключ
+//Class define a composite key
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode

@@ -3,7 +3,6 @@
 --changeset daniilsanets:004-1
 --comment Create user_badge table to link users and badges
 CREATE TABLE user_badge (
-                            user_uid UUID,
                             badge_uid UUID NOT NULL,
                             awarded_at TIMESTAMPTZ DEFAULT now(),
                             PRIMARY KEY (user_uid, badge_uid)
