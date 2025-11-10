@@ -61,7 +61,7 @@ public class QuestParticipation {
     @Column(name = "started_at")
     private OffsetDateTime startedAt;
 
-    @Min(1)
+    @Min(0)
     @Column(name = "score", nullable = false)
     @NotNull
     private Integer score;
