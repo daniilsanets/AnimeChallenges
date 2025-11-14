@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
 
 import java.util.Optional;

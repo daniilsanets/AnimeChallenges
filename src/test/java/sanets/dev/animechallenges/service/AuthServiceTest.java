@@ -10,13 +10,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import sanets.dev.animechallenges.dto.LoginResponseDto;
+import sanets.dev.animechallenges.dto.SignUpRequestDto;
+import sanets.dev.animechallenges.exception.UserNotFoundException;
+import sanets.dev.animechallenges.mapper.AuthMapper;
+import sanets.dev.animechallenges.model.RefreshToken;
 import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,11 +42,17 @@ public class AuthServiceTest {
     @Mock
     JwtService jwtService;
 
-    @InjectMocks
-    AuthService authService;
+    @Mock
+    private AuthMapper authMapper;
+
+    @Mock
+    RefreshTokenService refreshTokenService;
 
     @Captor
-    ArgumentCaptor<User> userCaptor;
+    private ArgumentCaptor<User> userCaptor;
+
+    @InjectMocks
+    AuthService authService;
 
     @Test
     void login_shouldThrowBadCredentials_whenPasswordIsIncorrect(){
@@ -63,48 +79,74 @@ public class AuthServiceTest {
         when(userRepository.findByUsername(inputUsernameOrEmail)).thenReturn(Optional.empty());
         when(userRepository.findByEmail(inputUsernameOrEmail)).thenReturn(Optional.empty());
 
-        assertThrows(UsernameNotFoundException.class, () -> authService.login(inputUsernameOrEmail, inputPassword));
+        assertThrows(UserNotFoundException.class, () -> authService.login(inputUsernameOrEmail, inputPassword));
     }
 
     @Test
-    void login_shouldReturnToken_whenUserIsValid(){
-        String inputUsernameOrEmail = "usernameOrEmail";
+    void login_shouldReturnDto_whenUserIsValid() {
+        String inputUsernameOrEmail = "testUser";
         String inputPassword = "password";
         String correctHashedPassword = "correctHashedPassword";
-        String expectedToken = "fake-jwt-token-string";
+        String expectedAccessToken = "fake-access-token-123";
+        String expectedRefreshTokenString = UUID.randomUUID().toString();
 
         User user = User.builder()
                 .username(inputUsernameOrEmail)
                 .passwordHash(correctHashedPassword)
+                .role(UserRole.USER)
+                .build();
+
+        RefreshToken mockRefreshToken = RefreshToken.builder()
+                .token(expectedRefreshTokenString)
+                .user(user)
                 .build();
 
         when(userRepository.findByUsername(inputUsernameOrEmail)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(inputPassword,correctHashedPassword)).thenReturn(true);
-        when(jwtService.generateToken(user)).thenReturn(expectedToken);
+        when(passwordEncoder.matches(inputPassword, correctHashedPassword)).thenReturn(true);
+        when(jwtService.generateToken(user)).thenReturn(expectedAccessToken);
+        when(refreshTokenService.createRefreshToken(user)).thenReturn(mockRefreshToken);
 
-        String actual = authService.login(inputUsernameOrEmail, inputPassword);
+        LoginResponseDto actualResponse = authService.login(inputUsernameOrEmail, inputPassword);
 
-        assertEquals(expectedToken, actual);
+        assertEquals(expectedAccessToken, actualResponse.getAccessToken());
+        assertEquals(expectedRefreshTokenString, actualResponse.getRefreshToken());
     }
 
     @Test
-    void signup_shouldSaveUser_whenUserIsValid() {
-        String username = "newUser";
-        String email = "new@example.com";
+    void signup_shouldCallMapperAndSave_whenRequestIsValid() {
+        // --- 1. Подготовка (Arrange) ---
         String rawPassword = "password123";
         String hashedPassword = "hashedPassword123";
 
+        // 1. Создаем DTO, который "придет" в сервис
+        SignUpRequestDto signUpRequestDto = new SignUpRequestDto();
+        signUpRequestDto.setUsername("newUser");
+        signUpRequestDto.setEmail("new@example.com");
+        signUpRequestDto.setPassword(rawPassword);
+
+        // 2. Создаем "фальшивого" User, которого "якобы" вернет маппер
+        User userFromMapper = User.builder()
+                .username("newUser")
+                .email("new@example.com")
+                .passwordHash(hashedPassword)
+                .role(UserRole.USER)
+                .build();
+
+        // 3. Настраиваем моки
         when(passwordEncoder.encode(rawPassword)).thenReturn(hashedPassword);
 
-        authService.signup(username, rawPassword, email, UserRole.USER);
 
-        verify(userRepository).save(userCaptor.capture());
+        when(authMapper.signupDtoToUser(
+                eq(signUpRequestDto),
+                eq(hashedPassword),
+                eq(UserRole.USER),
+                any(OffsetDateTime.class)
+        )).thenReturn(userFromMapper);
 
-        User capturedUser = userCaptor.getValue();
+        authService.signup(signUpRequestDto);
 
-        assertEquals(username, capturedUser.getUsername());
-        assertEquals(email, capturedUser.getEmail());
-        assertEquals(hashedPassword, capturedUser.getPasswordHash());
+        verify(userRepository).save(userFromMapper);
     }
+
 
 }

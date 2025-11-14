@@ -8,11 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import sanets.dev.animechallenges.dto.LoginRequestDto;
+import sanets.dev.animechallenges.dto.LoginResponseDto;
 import sanets.dev.animechallenges.dto.SignUpRequestDto;
 import sanets.dev.animechallenges.service.AuthService;
 import sanets.dev.animechallenges.service.JwtService;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.is;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -55,7 +57,9 @@ public class AuthControllerTest {
     void login_shouldReturnOkAndToken_whenRequestIsValid() throws Exception {
         String username = "testuser";
         String password = "password123";
-        String expectedToken = "fake-jwt-token";
+
+        String expectedAccessToken = "fake-access-token-123";
+        String expectedRefreshToken = "fake-refresh-token-abc";
 
         LoginRequestDto  requestDto = new LoginRequestDto();
         requestDto.setUsernameOrEmail(username);
@@ -63,14 +67,21 @@ public class AuthControllerTest {
 
         String requestJson = objectMapper.writeValueAsString(requestDto);
 
-        when(authService.login(username, password)).thenReturn(expectedToken);
+        LoginResponseDto mockResponseDto = new LoginResponseDto(
+                expectedAccessToken,
+                expectedRefreshToken,
+                "Bearer"
+        );
+
+        when(authService.login(username, password)).thenReturn(mockResponseDto);
 
         mockMvc.perform(
                 post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson)
         )
-        .andExpect(status().isOk())
-        .andExpect(MockMvcResultMatchers.content().string(expectedToken));
+        .andExpect(status().isOk()).andExpect(jsonPath("$.accessToken", is(expectedAccessToken)))
+        .andExpect(jsonPath("$.refreshToken", is(expectedRefreshToken)))
+        .andExpect(jsonPath("$.tokenType", is("Bearer")));
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sanets.dev.animechallenges.dto.LoginRequestDto;
+import sanets.dev.animechallenges.dto.LoginResponseDto;
+import sanets.dev.animechallenges.dto.RefreshRequestDto;
 import sanets.dev.animechallenges.dto.SignUpRequestDto;
 import sanets.dev.animechallenges.model.UserRole;
 import sanets.dev.animechallenges.service.AuthService;
@@ -28,12 +30,7 @@ public class AuthController {
     public ResponseEntity<?> signup(
             @RequestBody() SignUpRequestDto signUpRequestDto
     ) {
-        authService.signup(
-                signUpRequestDto.getUsername(),
-                signUpRequestDto.getPassword(),
-                signUpRequestDto.getEmail(),
-                UserRole.USER
-                );
+        authService.signup(signUpRequestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("You are with us :)");
     }
@@ -41,20 +38,25 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @RequestBody() LoginRequestDto loginRequestDto
-    ) throws Exception {
+    ){
+        LoginResponseDto loginResponseDto;
 
-        String jwtToken;
-
-        try {
-                jwtToken = authService.login(
+                loginResponseDto = authService.login(
                     loginRequestDto.getUsernameOrEmail(),
                     loginRequestDto.getPassword()
             );
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
-        }
 
-        return ResponseEntity.status(HttpStatus.OK).body(jwtToken);
+        return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(
+            @RequestBody() RefreshRequestDto refreshRequestDto
+    ){
+
+        String newAccessToken = authService.refreshToken(refreshRequestDto.getRefreshToken());
+        return ResponseEntity.status(HttpStatus.OK).body(newAccessToken);
     }
 
 }
+

@@ -2,18 +2,17 @@ package sanets.dev.animechallenges.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 @Getter
 @Setter
-public class LoginRequestDto {
+@NoArgsConstructor
+public class RefreshRequestDto {
 
-    @Length(max = 320)
+    @Length(max = 255)
     @NotNull
-    private String usernameOrEmail;
+    private String refreshToken;
 
-    @Length(min = 8)
-    @NotNull
-    private String password;
 }
