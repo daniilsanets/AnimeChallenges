@@ -37,7 +37,7 @@ ALTER TABLE quest_participation
             ON DELETE CASCADE;
 --rollback ALTER TABLE quest_participation DROP CONSTRAINT fk_quest_participation_quest_uid;
 
---changeset daniilsanets:006-4
+--changeset daniilsanets:006-5
 --comment Add positive check on score
 ALTER TABLE quest_participation
     ADD CONSTRAINT positive_score_check
