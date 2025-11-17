@@ -1,13 +1,14 @@
 package sanets.dev.animechallenges.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.SignUpRequestDto;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.model.UserRole;
 
 import java.time.OffsetDateTime;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN, unmappedSourcePolicy = ReportingPolicy.WARN)
 public interface AuthMapper {
 
     @Mapping(target = "passwordHash", source = "passwordHash")

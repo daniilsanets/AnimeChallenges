@@ -11,6 +11,7 @@ import sanets.dev.animechallenges.dto.LoginRequestDto;
 import sanets.dev.animechallenges.dto.LoginResponseDto;
 import sanets.dev.animechallenges.dto.RefreshRequestDto;
 import sanets.dev.animechallenges.dto.SignUpRequestDto;
+import sanets.dev.animechallenges.dto.SignUpResponseDto;
 import sanets.dev.animechallenges.model.UserRole;
 import sanets.dev.animechallenges.service.AuthService;
 
@@ -27,16 +28,16 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(
+    public ResponseEntity<SignUpResponseDto> signup(
             @RequestBody() SignUpRequestDto signUpRequestDto
     ) {
-        authService.signup(signUpRequestDto);
+        SignUpResponseDto signUpResponseDto = authService.signup(signUpRequestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("You are with us :)");
+        return ResponseEntity.status(HttpStatus.CREATED).body(signUpResponseDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
+    public ResponseEntity<LoginResponseDto> login(
             @RequestBody() LoginRequestDto loginRequestDto
     ){
         LoginResponseDto loginResponseDto;
@@ -50,7 +51,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(
+    public ResponseEntity<String> refresh(
             @RequestBody() RefreshRequestDto refreshRequestDto
     ){
 

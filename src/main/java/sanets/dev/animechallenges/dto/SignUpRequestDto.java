@@ -1,5 +1,6 @@
 package sanets.dev.animechallenges.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +15,14 @@ public class SignUpRequestDto {
     private String username;
 
     @Length(max = 320)
+    @Email
     @NotNull
     private String email;
 
-    @Length(min = 8)
+    /*
+    I don't get it enough( In our DB we have hashed password unlike here user give us his none-hashed password
+     */
+    @Length(max = 200)
     @NotNull
     private String password;
 

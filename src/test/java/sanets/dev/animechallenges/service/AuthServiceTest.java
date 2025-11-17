@@ -8,10 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sanets.dev.animechallenges.dto.LoginResponseDto;
 import sanets.dev.animechallenges.dto.SignUpRequestDto;
+import sanets.dev.animechallenges.dto.SignUpResponseDto;
+import sanets.dev.animechallenges.exception.UserAlreadyExistsException;
 import sanets.dev.animechallenges.exception.UserNotFoundException;
 import sanets.dev.animechallenges.mapper.AuthMapper;
 import sanets.dev.animechallenges.model.RefreshToken;
@@ -23,8 +24,7 @@ import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -148,5 +148,67 @@ public class AuthServiceTest {
         verify(userRepository).save(userFromMapper);
     }
 
+    @Test
+    void signup_shouldReturnTokens_whenUserSignUp(){
+        SignUpRequestDto signUpRequestDto = new SignUpRequestDto();
+        signUpRequestDto.setUsername("newUser");
+        signUpRequestDto.setEmail("someEmail@mail.com");
+        signUpRequestDto.setPassword("password123");
 
+        String hashedPassword = "hashedPassword123";
+        String expectedAccessToken = "some-random-super-crypto-token";
+        String expectedRefreshToken = "some-random-super-crypto-refresh-token";
+
+        User mockUser = new User();
+        mockUser.setUsername("newUser");
+
+        RefreshToken mockRefreshToken = new RefreshToken();
+        mockRefreshToken.setToken(expectedRefreshToken);
+
+        when(authMapper.signupDtoToUser(
+                any(SignUpRequestDto.class),
+                eq(hashedPassword),
+                any(UserRole.class),
+                any(OffsetDateTime.class)
+        )).thenReturn(mockUser);
+
+        when(passwordEncoder.encode("password123")).thenReturn(hashedPassword);
+        when(userRepository.save(mockUser)).thenReturn(mockUser);
+        when(refreshTokenService.createRefreshToken(mockUser)).thenReturn(mockRefreshToken);
+        when(jwtService.generateToken(mockUser)).thenReturn(expectedAccessToken);
+
+        SignUpResponseDto actual = authService.signup(signUpRequestDto);
+
+        assertNotNull(actual);
+        assertEquals(expectedAccessToken, actual.getAccessToken());
+        assertEquals(expectedRefreshToken, actual.getRefreshToken());
+
+        verify(passwordEncoder).encode("password123");
+        verify(authMapper).signupDtoToUser(any(), eq(hashedPassword), any(), any());
+        verify(userRepository).save(mockUser);
+        verify(jwtService).generateToken(mockUser);
+        verify(refreshTokenService).createRefreshToken(mockUser);
+    }
+
+    @Test
+    void signup_shouldThrowUserAlreadyExistsException_whenDBHasThisNickname(){
+        SignUpRequestDto signUpRequestDto = new SignUpRequestDto();
+        signUpRequestDto.setUsername("newUser");
+
+        when(userRepository.existsByUsername(signUpRequestDto.getUsername())).thenReturn(true);
+
+        assertThrows(UserAlreadyExistsException.class, () -> authService.signup(signUpRequestDto));
+    }
+
+    @Test
+    void signup_shouldThrowUserAlreadyExistsException_whenDBHasThisEmail(){
+        SignUpRequestDto signUpRequestDto = new SignUpRequestDto();
+        signUpRequestDto.setUsername("newUser");
+        signUpRequestDto.setEmail("someEmail@mail.com");
+
+        when(userRepository.existsByUsername(signUpRequestDto.getUsername())).thenReturn(false);
+        when(userRepository.existsByEmail(signUpRequestDto.getEmail())).thenReturn(true);
+
+        assertThrows(UserAlreadyExistsException.class, () -> authService.signup(signUpRequestDto));
+    }
 }

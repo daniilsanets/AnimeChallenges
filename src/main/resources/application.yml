@@ -1,0 +1,12 @@
+spring:
+    application:
+        name: AnimeChallenges
+    datasource:
+        url: jdbc:postgresql://localhost:5432/anime_challenges
+        username: postgres
+        password: password
+
+jwt:
+    secretKey: xyzqhpQYnQtFXqigYEeefzwxsglwfqbnAdvhNdQPrBwIVIRKgyzZiiSraYMwslij
+    lifetime: 900000 # 15 min
+    refreshTokenDurationMs: 604800000 # 7 days

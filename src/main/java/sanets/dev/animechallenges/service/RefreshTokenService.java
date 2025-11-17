@@ -18,6 +18,8 @@ import java.util.UUID;
 @Service
 public class RefreshTokenService {
 
+    private static final String REFRESH_TOKEN_NOT_FOUND_MSG = "Refresh token not found in DB!";
+
     @Value("${jwt.refreshTokenDurationMs}")
     private Long refreshTokenDurationMs;
 
@@ -49,8 +51,7 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken refreshToken) throws TokenRefreshException, HttpClientErrorException {
         if (refreshToken.getExpiryDate().isBefore(OffsetDateTime.now())) {
             refreshTokenRepository.delete(refreshToken);
-            throw new TokenRefreshException(refreshToken.getToken(),
-                    "Refresh token was expired. Please make a new signin request");
+            throw new TokenRefreshException(REFRESH_TOKEN_NOT_FOUND_MSG, refreshToken.getToken());
         }
         return refreshToken;
     }

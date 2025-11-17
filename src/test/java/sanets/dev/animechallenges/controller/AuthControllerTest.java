@@ -37,7 +37,7 @@ public class AuthControllerTest {
     private JwtService jwtService;
 
     @Test
-    void signup_shouldReturnCreated_whenRequestIsValid() throws Exception{
+    void signup_shouldReturnTokens_whenRequestIsValid() throws Exception{
         SignUpRequestDto requestDto = new SignUpRequestDto();
         requestDto.setUsername("testuser");
         requestDto.setPassword("test@example.com");
@@ -69,8 +69,7 @@ public class AuthControllerTest {
 
         LoginResponseDto mockResponseDto = new LoginResponseDto(
                 expectedAccessToken,
-                expectedRefreshToken,
-                "Bearer"
+                expectedRefreshToken
         );
 
         when(authService.login(username, password)).thenReturn(mockResponseDto);
