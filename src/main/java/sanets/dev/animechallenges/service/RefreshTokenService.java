@@ -37,7 +37,7 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken createRefreshToken(User user) {
 
-        refreshTokenRepository.deleteByUser(user);
+        refreshTokenRepository.deleteByUserId(user.getUid());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
@@ -51,7 +51,7 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken refreshToken) throws TokenRefreshException, HttpClientErrorException {
         if (refreshToken.getExpiryDate().isBefore(OffsetDateTime.now())) {
             refreshTokenRepository.delete(refreshToken);
-            throw new TokenRefreshException(REFRESH_TOKEN_NOT_FOUND_MSG, refreshToken.getToken());
+            throw new TokenRefreshException(REFRESH_TOKEN_NOT_FOUND_MSG);
         }
         return refreshToken;
     }

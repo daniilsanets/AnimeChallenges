@@ -51,11 +51,13 @@ public class AuthService {
     public SignUpResponseDto signup(SignUpRequestDto signUpRequestDto) {
 
         if (userRepository.existsByUsername(signUpRequestDto.getUsername())) {
-            throw new UserAlreadyExistsException(USERNAME_ALREADY_EXISTS_MSG, signUpRequestDto.getUsername());
+            String message = USERNAME_ALREADY_EXISTS_MSG + " " +  signUpRequestDto.getUsername();
+            throw new UserAlreadyExistsException(message);
         }
 
         if (userRepository.existsByEmail(signUpRequestDto.getEmail())) {
-            throw new UserAlreadyExistsException(EMAIL_ALREADY_EXISTS_MSG,signUpRequestDto.getEmail());
+            String message = EMAIL_ALREADY_EXISTS_MSG + " " +  signUpRequestDto.getEmail();
+            throw new UserAlreadyExistsException(message);
         }
         
         String hashedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
@@ -80,13 +82,15 @@ public class AuthService {
     }
 
     public LoginResponseDto login(String usernameOrEmail, String password) throws UserNotFoundException, BadCredentialsException {
+        String message = USERNAME_ALREADY_EXISTS_MSG + " " +  usernameOrEmail;
 
         User user = userRepository.findByUsername(usernameOrEmail)
                 .or(() -> userRepository.findByEmail(usernameOrEmail))
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG, usernameOrEmail));
+                .orElseThrow(() -> new UserNotFoundException(message));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new WrongPasswordException(WRONG_PASSWORD_MSG, user.getUsername());
+            String messageWrongPassword = WRONG_PASSWORD_MSG + user.getUsername();
+            throw new WrongPasswordException(messageWrongPassword);
         }
 
         String accessToken = jwtService.generateToken(user);
@@ -97,7 +101,7 @@ public class AuthService {
 
     public String refreshToken(String requestRefreshToken) {
         RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken)
-                .orElseThrow(() -> new TokenRefreshException(REFRESH_TOKEN_NOT_FOUND_MSG, requestRefreshToken));
+                .orElseThrow(() -> new TokenRefreshException(REFRESH_TOKEN_NOT_FOUND_MSG));
 
         refreshTokenService.verifyExpiration(refreshToken);
 

@@ -21,7 +21,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -29,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDto> signup(
-            @RequestBody() SignUpRequestDto signUpRequestDto
+            @RequestBody SignUpRequestDto signUpRequestDto
     ) {
         SignUpResponseDto signUpResponseDto = authService.signup(signUpRequestDto);
 
@@ -38,7 +37,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
-            @RequestBody() LoginRequestDto loginRequestDto
+            @RequestBody LoginRequestDto loginRequestDto
     ){
         LoginResponseDto loginResponseDto;
 
@@ -52,7 +51,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(
-            @RequestBody() RefreshRequestDto refreshRequestDto
+            @RequestBody RefreshRequestDto refreshRequestDto
     ){
 
         String newAccessToken = authService.refreshToken(refreshRequestDto.getRefreshToken());

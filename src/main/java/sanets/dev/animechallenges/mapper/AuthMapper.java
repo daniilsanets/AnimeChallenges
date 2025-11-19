@@ -8,7 +8,7 @@ import sanets.dev.animechallenges.model.UserRole;
 
 import java.time.OffsetDateTime;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN, unmappedSourcePolicy = ReportingPolicy.WARN)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, unmappedSourcePolicy = ReportingPolicy.ERROR)
 public interface AuthMapper {
 
     @Mapping(target = "passwordHash", source = "passwordHash")
