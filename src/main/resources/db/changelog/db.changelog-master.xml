@@ -14,4 +14,5 @@
     <include file="sql/006-create-quest-participation-table.sql" relativeToChangelogFile="true"/>
     <include file="sql/007-create-submission-table.sql" relativeToChangelogFile="true"/>
     <include file="sql/008-create-submission-media-table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/009-create-refresh-tokens.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

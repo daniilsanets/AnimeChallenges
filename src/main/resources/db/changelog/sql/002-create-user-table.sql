@@ -37,3 +37,15 @@ ALTER TABLE users
     ADD CONSTRAINT email_format_check
         CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 --rollback ALTER TABLE users DROP CONSTRAINT email_format_check;
+
+--changeset daniilsanets:002-5
+--comment Change role column type to VARCHAR(50)
+ALTER TABLE users
+ALTER COLUMN role TYPE VARCHAR(50)
+    USING role::text;
+--rollback ALTER TABLE users ALTER COLUMN role TYPE user_roles USING role::user_roles;
+
+--changeset daniilsanets:002-6
+--comment Drop obsolete enum type user_roles
+DROP TYPE IF EXISTS user_roles;
+--rollback CREATE TYPE user_roles AS ENUM ('GUEST','USER','ADMIN');
