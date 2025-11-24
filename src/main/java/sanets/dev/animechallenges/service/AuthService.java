@@ -1,6 +1,6 @@
 package sanets.dev.animechallenges.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,7 @@ import sanets.dev.animechallenges.repository.UserRepository;
 import java.time.OffsetDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private static final String REFRESH_TOKEN_NOT_FOUND_MSG = "Refresh token not found in DB!";
@@ -33,20 +34,6 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthMapper authMapper;
-
-    @Autowired
-    public AuthService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder,
-                       JwtService jwtService,
-                       RefreshTokenService refreshTokenService,
-                       AuthMapper authMapper
-    ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
-        this.refreshTokenService = refreshTokenService;
-        this.authMapper = authMapper;
-    }
 
     public SignUpResponseDto signup(SignUpRequestDto signUpRequestDto) {
 
@@ -82,7 +69,7 @@ public class AuthService {
     }
 
     public LoginResponseDto login(String usernameOrEmail, String password) throws UserNotFoundException, BadCredentialsException {
-        String message = USERNAME_ALREADY_EXISTS_MSG + " " +  usernameOrEmail;
+        String message = USER_NOT_FOUND_MSG + " " +  usernameOrEmail;
 
         User user = userRepository.findByUsername(usernameOrEmail)
                 .or(() -> userRepository.findByEmail(usernameOrEmail))

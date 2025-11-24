@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Max;
@@ -63,6 +64,11 @@ public class Quest {
     @Column(name = "reward_points", nullable = false)
     @NotNull
     private Integer rewardPoints;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "badge_uid", referencedColumnName = "uid", nullable = false)
+    @NotNull
+    private Badge badge;
 
     @Min(1)
     @Max(5)

@@ -8,7 +8,7 @@ import sanets.dev.animechallenges.model.UserRole;
 
 import java.time.OffsetDateTime;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, unmappedSourcePolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface AuthMapper {
 
     @Mapping(target = "passwordHash", source = "passwordHash")
@@ -17,6 +17,10 @@ public interface AuthMapper {
     @Mapping(target = "updatedAt", source = "now")
 
     @Mapping(target = "uid", ignore = true)
+    @Mapping(target = "nickname", ignore = true)
+    @Mapping(target = "avatar",  ignore = true)
+    @Mapping(target = "bio" ,   ignore = true)
+    @Mapping(target = "isActive", constant = "false")
     User signupDtoToUser(SignUpRequestDto dto, String passwordHash, UserRole role, OffsetDateTime now);
 
 }

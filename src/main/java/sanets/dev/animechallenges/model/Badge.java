@@ -3,6 +3,8 @@ package sanets.dev.animechallenges.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -49,6 +51,11 @@ public class Badge {
     @Length(max = 100)
     private String code;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(name = "badge_type", columnDefinition = "badge_types", nullable = false)
+    private BadgeType badgeType;
+
     @Column(name = "title", nullable = false, length = 200)
     @NotNull
     @Length(max = 200)
@@ -67,6 +74,10 @@ public class Badge {
     @Column(name="rule", nullable = false, columnDefinition="jsonb")
     @NotNull
     private Map<String, Object> rule;
+
+    @Column(name = "is_active", nullable = false)
+    @NotNull
+    private boolean isActive;
 
     @CreationTimestamp
     @Column(name="created_at", nullable = false, updatable = false)
