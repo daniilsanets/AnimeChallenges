@@ -12,4 +12,4 @@ jwt:
     refreshTokenDurationMs: 604800000 # 7 days
 
 file:
-    uploadDir: somePath
+    uploadDir: uploads

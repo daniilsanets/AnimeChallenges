@@ -37,7 +37,7 @@ public class BadgeService {
     private final BadgeMapper badgeMapper;
     private final MediaService mediaService;
 
-    public boolean hasUserThisBadge(User user, Badge badge) {
+    public boolean userHasBadge(User user, Badge badge) {
         return userBadgeRepository.findByUser_Uid_AndBadge_Uid(user.getUid(), badge.getUid()).isPresent();
     }
 
@@ -46,7 +46,7 @@ public class BadgeService {
     }
 
     public boolean saveBadgeToUser(User user, Badge badge, boolean forced) {
-        if (hasUserThisBadge(user, badge) && !forced) {
+        if (userHasBadge(user, badge) && !forced) {
             return false;
         }
 

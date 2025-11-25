@@ -14,6 +14,7 @@ import sanets.dev.animechallenges.dto.SignUpRequestDto;
 import sanets.dev.animechallenges.dto.SignUpResponseDto;
 import sanets.dev.animechallenges.exception.UserAlreadyExistsException;
 import sanets.dev.animechallenges.exception.UserNotFoundException;
+import sanets.dev.animechallenges.exception.WrongPasswordException;
 import sanets.dev.animechallenges.mapper.AuthMapper;
 import sanets.dev.animechallenges.model.RefreshToken;
 import sanets.dev.animechallenges.model.User;
@@ -55,7 +56,7 @@ public class AuthServiceTest {
     AuthService authService;
 
     @Test
-    void login_shouldThrowBadCredentials_whenPasswordIsIncorrect(){
+    void login_shouldThrowWrongPasswordException_whenPasswordIsIncorrect(){
         String inputUsername = "testUser";
         String inputPassword = "wrongPassword";
         String correctHashedPassword = "correctHashedPassword";
@@ -68,7 +69,7 @@ public class AuthServiceTest {
         when(userRepository.findByUsername(inputUsername)).thenReturn(Optional.of(foundUser));
         when(passwordEncoder.matches(inputPassword,correctHashedPassword)).thenReturn(false);
 
-        assertThrows(BadCredentialsException.class, () -> authService.login(inputUsername, inputPassword));
+        assertThrows(WrongPasswordException.class, () -> authService.login(inputUsername, inputPassword));
     }
 
     @Test
@@ -114,17 +115,16 @@ public class AuthServiceTest {
 
     @Test
     void signup_shouldCallMapperAndSave_whenRequestIsValid() {
-        // --- 1. Подготовка (Arrange) ---
         String rawPassword = "password123";
         String hashedPassword = "hashedPassword123";
+        RefreshToken mockRefreshToken = new RefreshToken();
+        mockRefreshToken.setToken("test-refresh-token");
 
-        // 1. Создаем DTO, который "придет" в сервис
         SignUpRequestDto signUpRequestDto = new SignUpRequestDto();
         signUpRequestDto.setUsername("newUser");
         signUpRequestDto.setEmail("new@example.com");
         signUpRequestDto.setPassword(rawPassword);
 
-        // 2. Создаем "фальшивого" User, которого "якобы" вернет маппер
         User userFromMapper = User.builder()
                 .username("newUser")
                 .email("new@example.com")
@@ -142,6 +142,9 @@ public class AuthServiceTest {
                 eq(UserRole.USER),
                 any(OffsetDateTime.class)
         )).thenReturn(userFromMapper);
+
+        when(refreshTokenService.createRefreshToken(any(User.class)))
+                .thenReturn(mockRefreshToken);
 
         authService.signup(signUpRequestDto);
 

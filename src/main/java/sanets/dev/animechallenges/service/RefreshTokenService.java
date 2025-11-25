@@ -37,7 +37,7 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken createRefreshToken(User user) {
 
-        refreshTokenRepository.deleteByUserId(user.getUid());
+        refreshTokenRepository.deleteByUser_Uid(user.getUid());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
