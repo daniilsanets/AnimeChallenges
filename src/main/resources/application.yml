@@ -12,4 +12,5 @@ jwt:
     refreshTokenDurationMs: 604800000 # 7 days
 
 file:
-    uploadDir: uploads
+    upload-dir: /var/anime-challenges/data
+    base-url: /api/v1/media/

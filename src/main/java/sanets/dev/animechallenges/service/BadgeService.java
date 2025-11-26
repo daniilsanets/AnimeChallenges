@@ -1,10 +1,14 @@
 package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sanets.dev.animechallenges.dto.BadgeFilterDto;
 import sanets.dev.animechallenges.dto.BadgeRequestDto;
 import sanets.dev.animechallenges.dto.BadgeResponseDto;
 import sanets.dev.animechallenges.exception.BadgeNotFoundException;
@@ -76,11 +80,14 @@ public class BadgeService {
 
         List<Badge> achievements = badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT);
 
-        for (Badge badge : achievements) {
-            if(!ownedBadgeIds.contains(badge.getUid()) && tryAssignAchievement(user, badge, numberOfCompletedQuests)) {
-                ownedBadgeIds.add(badge.getUid());
-            }
-        }
+        achievements.stream()
+                .filter(badge -> !ownedBadgeIds.contains(badge.getUid()))
+                .forEach(badge -> {
+                    if (tryAssignAchievement(user, badge, numberOfCompletedQuests)) {
+                        ownedBadgeIds.add(badge.getUid());
+                    }
+                });
+
         Badge questBadge = quest.getBadge();
         if (questBadge != null && !ownedBadgeIds.contains(questBadge.getUid())) {
             saveBadgeToUser(user, questBadge, true);
@@ -104,16 +111,27 @@ public class BadgeService {
         }
     }
 
-    public List<BadgeResponseDto> getAllActiveBadges() {
-        List<Badge> badges = badgeRepository.findAllWithImages();
+    public Page<BadgeResponseDto> getBadgesWithFilter(BadgeFilterDto filter, Pageable pageable) {
+        Specification<Badge> spec = (root, query, cb) -> cb.conjunction();
 
-        return badges.stream()
-                .map(badgeMapper::toBadgeResponseDto)
-                .toList();
+        if (filter.getNameQuery() != null && !filter.getNameQuery().isBlank()){
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("name")), "%" + filter.getNameQuery().toLowerCase() + "%")
+            );
+        }
+
+        if (filter.getIsActive() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("isActive"), filter.getIsActive())
+                    );
+        }
+
+        Page<Badge> badgePage = badgeRepository.findAll(spec, pageable);
+
+        return badgePage.map(badgeMapper::toBadgeResponseDto);
     }
 
-    @Transactional
-    public void deleteBadge(UUID badgeUid) throws  BadgeNotFoundException {
+    public void deleteBadge(UUID badgeUid) throws BadgeNotFoundException {
         Badge badge = badgeRepository.findBadgeByUid(badgeUid)
                 .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
 

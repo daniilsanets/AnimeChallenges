@@ -22,7 +22,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class MediaService {
 
@@ -31,10 +30,18 @@ public class MediaService {
     private static final String MEDIA_NOT_DELETED_FROM_SERVER_MSG = "Media not deleted from server storage";
     private static final String DIRECTORY_NOT_CREATED_MSG = "Could not initialize storage location";
 
-    @Value("${file.uploadDir}")
-    private String uploadDir;
-
+    private final String uploadDir;
+    private final String baseUrl;
     private final MediaRepository mediaRepository;
+
+    public MediaService(
+            @Value("${file.upload-dir}") String uploadDir,
+            @Value("${file.base-url}") String baseUrl,
+            MediaRepository mediaRepository) {
+        this.uploadDir = uploadDir;
+        this.baseUrl = baseUrl;
+        this.mediaRepository = mediaRepository;
+    }
 
     @PostConstruct
     public void initMedia() {
@@ -75,7 +82,7 @@ public class MediaService {
         }
     }
 
-    public String getStorageKey(MultipartFile file){
+    private String getStorageKey(MultipartFile file){
         String originalFileName = file.getOriginalFilename();
         String extension = originalFileName != null && originalFileName.contains(".")
                 ? originalFileName.substring(originalFileName.lastIndexOf('.'))
@@ -98,9 +105,11 @@ public class MediaService {
             throw new MediaNotUploadedException(MEDIA_NOT_UPLOADED_TO_SERVER_MSG);
         }
 
+        String webUrl = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + storageKey;
+
         Media media = Media.builder()
                 .storageKey(storageKey)
-                .url("/uploads/" + storageKey)
+                .url(webUrl)
                 .mimeType(file.getContentType())
                 .size(file.getSize())
                 .build();
@@ -111,7 +120,7 @@ public class MediaService {
             try {
                 Files.deleteIfExists(filePath);
             } catch (IOException e) {
-                throw new MediaNotDeletedException(MEDIA_NOT_DELETED_FROM_SERVER_MSG);
+                log.error("CRITICAL: Failed to clean up file {} after DB error", filePath, e);
             }
 
             String msg = MEDIA_NOT_UPLOADED_TO_SERVER_MSG + " " + ex.getMessage();
