@@ -4,17 +4,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import sanets.dev.animechallenges.model.UserBadge;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 public interface UserBadgeRepository extends JpaRepository<UserBadge, UUID> {
-    Optional<UserBadge> findByUser_Uid_AndBadge_Uid(UUID userUid, UUID badgeUid);
+    Optional<UserBadge> findByUserUidAndBadgeUid(UUID userUid, UUID badgeUid);
 
     @Query("SELECT ub.badge.uid FROM UserBadge ub WHERE ub.user.uid = :userId")
     Set<UUID> findBadgeIdsByUser(@Param("userId") UUID userId);

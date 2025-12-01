@@ -4,13 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 import sanets.dev.animechallenges.exception.MediaNotUploadedException;
+import sanets.dev.animechallenges.mapper.MediaMapper;
 import sanets.dev.animechallenges.model.Media;
 import sanets.dev.animechallenges.repository.MediaRepository;
 
@@ -30,6 +33,9 @@ class MediaServiceTest {
     @Mock
     private MediaRepository mediaRepository;
 
+    @Mock
+    private MediaMapper mediaMapper;
+
     @InjectMocks
     private MediaService mediaService;
 
@@ -39,21 +45,36 @@ class MediaServiceTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(mediaService, "uploadDir", tempDir.toString());
+        ReflectionTestUtils.setField(mediaService, "baseUrl", "/api/v1/media/");
 
         mediaService.initMedia();
     }
 
     @Test
     void upload_shouldSaveFileAndEntity_whenSuccessful() {
+
         MockMultipartFile file = new MockMultipartFile(
                 "file", "test.png", "image/png", "test-content".getBytes()
         );
+        when(mediaMapper.toMedia(any(MultipartFile.class), any(String.class), any(String.class)))
+                .thenAnswer(invocation -> {
+                    String passedStorageKey = invocation.getArgument(1);
+                    String passedUrl = invocation.getArgument(2);
+                    return Media.builder()
+                            .storageKey(passedStorageKey)
+                            .url(passedUrl)
+                            .mimeType("image/png")
+                            .size(100L)
+                            .build();
+                });
 
-        when(mediaRepository.save(any(Media.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(mediaRepository.save(any(Media.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         Media result = mediaService.upload(file);
 
         assertNotNull(result);
+        assertNotNull(result.getStorageKey());
         assertTrue(result.getStorageKey().endsWith(".png"));
 
         Path savedFilePath = tempDir.resolve(result.getStorageKey());
@@ -67,7 +88,9 @@ class MediaServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "fail-db.png", "image/png", "content".getBytes()
         );
-
+        
+        when(mediaMapper.toMedia(any(), any(), any()))
+                .thenReturn(Media.builder().build());
         when(mediaRepository.save(any(Media.class)))
                 .thenThrow(new DataIntegrityViolationException("DB Error"));
 
