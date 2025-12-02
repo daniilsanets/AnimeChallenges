@@ -32,7 +32,6 @@ public class AuthController {
     public ResponseEntity<SignUpResponseDto> signup(
             @RequestBody SignUpRequestDto signUpRequestDto
     ) {
-        log.info("Signup request received by user: {}", signUpRequestDto.getUsername());
         SignUpResponseDto signUpResponseDto = authService.signup(signUpRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(signUpResponseDto);
     }
@@ -41,13 +40,10 @@ public class AuthController {
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody LoginRequestDto loginRequestDto
     ){
-        log.info("User send data to login", loginRequestDto.getUsernameOrEmail());
-        log.debug("Receive loginRequestDto: {}", loginRequestDto.getUsernameOrEmail());
         LoginResponseDto loginResponseDto = authService.login(
                     loginRequestDto.getUsernameOrEmail(),
                     loginRequestDto.getPassword()
             );
-        log.debug("Send loginResponseDto to user: {}", loginRequestDto.getUsernameOrEmail());
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
     }
 
@@ -55,9 +51,7 @@ public class AuthController {
     public ResponseEntity<String> refresh(
             @RequestBody RefreshRequestDto refreshRequestDto
     ){
-        log.debug("Receive refreshRequestDto");
         String newAccessToken = authService.refreshToken(refreshRequestDto.getRefreshToken());
-        log.debug("Send new access token");
         return ResponseEntity.status(HttpStatus.OK).body(newAccessToken);
     }
 

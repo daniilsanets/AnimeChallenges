@@ -59,7 +59,6 @@ public class MediaService {
         }
     }
 
-    @Transactional
     public void delete(UUID mediaId) throws MediaNotFoundException{
         log.debug("Invoke delete media {}", mediaId);
         Media media = mediaRepository.findById(mediaId)
@@ -87,30 +86,6 @@ public class MediaService {
         }
     }
 
-    private String createStorageKey(MultipartFile file){
-        String originalFileName = file.getOriginalFilename();
-        String extension = originalFileName != null && originalFileName.contains(".")
-                ? originalFileName.substring(originalFileName.lastIndexOf('.'))
-                : "";
-        log.debug("Create storage key");
-        return UUID.randomUUID().toString() + extension;
-    }
-
-    private Path saveFile(MultipartFile file, String storageKey){
-        Path filePath;
-
-        try {
-            Path uploadDirPath = Paths.get(uploadDir);
-
-            filePath = uploadDirPath.resolve(storageKey);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return filePath;
-        } catch (IOException ex) {
-            log.error("Error to upload file: ", ex);
-            throw new MediaNotUploadedException(MEDIA_NOT_UPLOADED_TO_SERVER_MSG);
-        }
-    }
-
     public Media upload(MultipartFile file) throws MediaNotUploadedException{
         String storageKey = createStorageKey(file);
         Path filePath = saveFile(file, storageKey);
@@ -133,6 +108,30 @@ public class MediaService {
         }
 
         return media;
+    }
+
+    private String createStorageKey(MultipartFile file){
+        String originalFileName = file.getOriginalFilename();
+        String extension = originalFileName != null && originalFileName.contains(".")
+                ? originalFileName.substring(originalFileName.lastIndexOf('.'))
+                : "";
+        log.debug("Create storage key");
+        return UUID.randomUUID().toString() + extension;
+    }
+
+    private Path saveFile(MultipartFile file, String storageKey){
+        Path filePath;
+
+        try {
+            Path uploadDirPath = Paths.get(uploadDir);
+
+            filePath = uploadDirPath.resolve(storageKey);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            return filePath;
+        } catch (IOException ex) {
+            log.error("Error to upload file: ", ex);
+            throw new MediaNotUploadedException(MEDIA_NOT_UPLOADED_TO_SERVER_MSG);
+        }
     }
 
 }

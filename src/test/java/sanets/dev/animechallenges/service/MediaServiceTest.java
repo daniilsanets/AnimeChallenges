@@ -88,7 +88,7 @@ class MediaServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "fail-db.png", "image/png", "content".getBytes()
         );
-        
+
         when(mediaMapper.toMedia(any(), any(), any()))
                 .thenReturn(Media.builder().build());
         when(mediaRepository.save(any(Media.class)))
