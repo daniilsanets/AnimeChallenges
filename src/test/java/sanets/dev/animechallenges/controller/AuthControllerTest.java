@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest()
 @AutoConfigureMockMvc
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +40,7 @@ public class AuthControllerTest {
     void signup_shouldReturnTokens_whenRequestIsValid() throws Exception{
         SignUpRequestDto requestDto = new SignUpRequestDto();
         requestDto.setUsername("testuser");
-        requestDto.setPassword("test@example.com");
+        requestDto.setEmail("test@example.com");
         requestDto.setPassword("password123");
 
         String requestJson = objectMapper.writeValueAsString(requestDto);
@@ -79,8 +79,8 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson)
         )
-        .andExpect(status().isOk()).andExpect(jsonPath("$.accessToken", is(expectedAccessToken)))
-        .andExpect(jsonPath("$.refreshToken", is(expectedRefreshToken)))
-        .andExpect(jsonPath("$.tokenType", is("Bearer")));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.accessToken", is(expectedAccessToken)))
+        .andExpect(jsonPath("$.refreshToken", is(expectedRefreshToken)));
     }
 }

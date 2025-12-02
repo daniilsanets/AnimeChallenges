@@ -1,5 +1,6 @@
 package sanets.dev.animechallenges.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class RefreshTokenService {
 
@@ -37,7 +39,7 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken createRefreshToken(User user) {
 
-        refreshTokenRepository.deleteByUserId(user.getUid());
+        refreshTokenRepository.deleteByUserUid(user.getUid());
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
@@ -51,6 +53,7 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken refreshToken) throws TokenRefreshException, HttpClientErrorException {
         if (refreshToken.getExpiryDate().isBefore(OffsetDateTime.now())) {
             refreshTokenRepository.delete(refreshToken);
+            log.info("Refresh token expired!");
             throw new TokenRefreshException(REFRESH_TOKEN_NOT_FOUND_MSG);
         }
         return refreshToken;

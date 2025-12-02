@@ -10,3 +10,7 @@ jwt:
     secretKey: xyzqhpQYnQtFXqigYEeefzwxsglwfqbnAdvhNdQPrBwIVIRKgyzZiiSraYMwslij
     lifetime: 900000 # 15 min
     refreshTokenDurationMs: 604800000 # 7 days
+
+file:
+    upload-dir: /var/anime-challenges/data
+    base-url: /api/v1/media/

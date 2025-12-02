@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import sanets.dev.animechallenges.exception.UserNotFoundException;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.model.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
@@ -48,7 +49,7 @@ public class MyUserDetailsServiceTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThrows(UsernameNotFoundException.class, () -> myUserDetailsService.loadUserByUsername(username));
+        assertThrows(UserNotFoundException.class, () -> myUserDetailsService.loadUserByUsername(username));
     }
 
 }

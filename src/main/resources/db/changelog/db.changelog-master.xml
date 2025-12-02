@@ -15,4 +15,6 @@
     <include file="sql/007-create-submission-table.sql" relativeToChangelogFile="true"/>
     <include file="sql/008-create-submission-media-table.sql" relativeToChangelogFile="true"/>
     <include file="sql/009-create-refresh-tokens.sql" relativeToChangelogFile="true"/>
+    <include file="sql/010-add-badge-type-and-is-active-to-badge.sql" relativeToChangelogFile="true"/>
+    <include file="sql/011-add-badge-uid-to-quest.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>
