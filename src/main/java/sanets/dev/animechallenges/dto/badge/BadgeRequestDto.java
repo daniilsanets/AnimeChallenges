@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.dto;
+package sanets.dev.animechallenges.dto.badge;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -3,7 +3,7 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import sanets.dev.animechallenges.dto.SignUpRequestDto;
+import sanets.dev.animechallenges.dto.auth.SignUpRequestDto;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.model.UserRole;
 

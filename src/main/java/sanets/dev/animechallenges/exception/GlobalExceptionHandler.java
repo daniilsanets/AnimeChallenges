@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import sanets.dev.animechallenges.exception.authExceptions.TokenRefreshException;
+import sanets.dev.animechallenges.exception.authExceptions.UserAlreadyExistsException;
+import sanets.dev.animechallenges.exception.authExceptions.WrongPasswordException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

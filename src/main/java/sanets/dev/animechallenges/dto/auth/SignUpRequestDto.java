@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.dto;
+package sanets.dev.animechallenges.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

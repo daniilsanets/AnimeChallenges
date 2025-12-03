@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.dto;
+package sanets.dev.animechallenges.dto.badge;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,12 +1,11 @@
 package sanets.dev.animechallenges.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import sanets.dev.animechallenges.exception.UserNotFoundException;
+import sanets.dev.animechallenges.exception.authExceptions.UserNotFoundException;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.repository.UserRepository;
 

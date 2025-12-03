@@ -78,7 +78,6 @@ public class Quest {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_uid", referencedColumnName = "uid", nullable = false)
-    @Setter(AccessLevel.NONE)
     @NotNull
     private User creator;
 
