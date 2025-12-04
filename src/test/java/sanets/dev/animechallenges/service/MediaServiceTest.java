@@ -11,7 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-import sanets.dev.animechallenges.exception.mediaExceptions.MediaNotUploadedException;
+import sanets.dev.animechallenges.exception.media.MediaNotUploadedException;
 import sanets.dev.animechallenges.mapper.MediaMapper;
 import sanets.dev.animechallenges.model.Media;
 import sanets.dev.animechallenges.repository.MediaRepository;

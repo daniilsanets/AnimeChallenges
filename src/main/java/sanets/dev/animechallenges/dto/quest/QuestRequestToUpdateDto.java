@@ -24,8 +24,6 @@ public class QuestRequestToUpdateDto {
     @Max(10)
     private Integer rewardPoints;
 
-    private UUID badge;
-
     @Min(1)
     @Max(5)
     private Integer maxAttempts;

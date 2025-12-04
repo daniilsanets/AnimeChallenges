@@ -12,8 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import sanets.dev.animechallenges.dto.badge.BadgeFilterDto;
 import sanets.dev.animechallenges.dto.badge.BadgeRequestDto;
 import sanets.dev.animechallenges.dto.badge.BadgeResponseDto;
-import sanets.dev.animechallenges.exception.badgeExceptions.BadgeNotFoundException;
-import sanets.dev.animechallenges.exception.mediaExceptions.MediaNotUploadedException;
+import sanets.dev.animechallenges.exception.badge.BadgeNotFoundException;
+import sanets.dev.animechallenges.exception.media.MediaNotUploadedException;
 import sanets.dev.animechallenges.mapper.BadgeMapper;
 import sanets.dev.animechallenges.model.Badge;
 import sanets.dev.animechallenges.model.BadgeType;
@@ -29,6 +29,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static sanets.dev.animechallenges.repository.specification.BadgeSpecification.isActive;
+import static sanets.dev.animechallenges.repository.specification.BadgeSpecification.nameContains;
 
 @Slf4j
 @Service
@@ -126,20 +129,10 @@ public class BadgeService {
     }
 
     public Page<BadgeResponseDto> getBadgesWithFilter(BadgeFilterDto filter, Pageable pageable) {
-        Specification<Badge> spec = (root, query, cb) -> cb.conjunction();
+        Specification<Badge> spec = Specification.where(null);
 
-        if (filter.getNameQuery() != null && !filter.getNameQuery().isBlank()){
-            spec = spec.and((root, query, cb) ->
-                    cb.like(cb.lower(root.get("name")), "%" + filter.getNameQuery().toLowerCase() + "%")
-            );
-        }
-
-        log.debug("Filter is null or blank {}", filter.getNameQuery());
-        if (filter.getIsActive() != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("isActive"), filter.getIsActive())
-                    );
-        }
+        spec = spec.and(nameContains(filter.getNameQuery()))
+                .and(isActive(filter.getIsActive()));
 
         Page<Badge> badgePage = badgeRepository.findAll(spec, pageable);
 

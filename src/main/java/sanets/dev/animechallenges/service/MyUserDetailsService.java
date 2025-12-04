@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import sanets.dev.animechallenges.exception.authExceptions.UserNotFoundException;
+import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.repository.UserRepository;
 

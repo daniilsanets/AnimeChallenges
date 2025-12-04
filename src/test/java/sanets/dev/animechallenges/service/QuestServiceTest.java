@@ -12,7 +12,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sanets.dev.animechallenges.dto.quest.QuestRequestDto;
 import sanets.dev.animechallenges.dto.quest.QuestRequestToUpdateDto;
-import sanets.dev.animechallenges.exception.commonExceptions.InvalidAccessException;
+import sanets.dev.animechallenges.exception.common.InvalidAccessException;
 import sanets.dev.animechallenges.mapper.QuestMapper;
 import sanets.dev.animechallenges.model.Badge;
 import sanets.dev.animechallenges.model.Quest;
@@ -78,7 +78,7 @@ class QuestServiceTest {
     }
 
     @Test
-    void createQuest() {
+    void createQuestShouldCreateQuest_whenSuccessfully() {
         QuestRequestDto questRequestDto = new QuestRequestDto();
         questRequestDto.setTitle("title");
         questRequestDto.setDescription("description");
@@ -101,7 +101,7 @@ class QuestServiceTest {
     }
 
     @Test
-    void updateQuestShouldThrowInvalidAccessException_whenUserIsNotCreator() {
+    void test_updateQuest_ShouldThrowInvalidAccessException_whenUserIsNotCreator() {
         User notCreator = User.builder()
                 .uid(UUID.randomUUID())
                 .username("Almost danechka")
