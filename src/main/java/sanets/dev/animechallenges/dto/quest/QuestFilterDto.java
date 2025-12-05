@@ -12,5 +12,4 @@ public class QuestFilterDto {
     private Integer rewardPoints;
     private Integer maxAttempts;
     private Boolean isActive;
-
 }

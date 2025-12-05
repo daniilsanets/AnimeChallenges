@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.quest.QuestResponseDto;
 import sanets.dev.animechallenges.dto.quest.QuestFilterDto;
-import sanets.dev.animechallenges.dto.quest.QuestRequestDto;
-import sanets.dev.animechallenges.dto.quest.QuestRequestToUpdateDto;
+import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
+import sanets.dev.animechallenges.dto.quest.UpdateQuestRequestDto;
 import sanets.dev.animechallenges.exception.badge.BadgeNotFoundException;
 import sanets.dev.animechallenges.exception.common.InvalidAccessException;
 import sanets.dev.animechallenges.exception.quest.QuestNotCreatedException;
@@ -49,22 +50,24 @@ public class QuestService {
     private final UserRepository userRepository;
     private final QuestMapper questMapper;
 
-    public void createQuest(QuestRequestDto questRequestDto)
+    public void createQuest(CreateQuestRequestDto createQuestRequestDto)
             throws BadgeNotFoundException, UserNotFoundException, QuestNotCreatedException
     {
-        User creator = userRepository.findById(questRequestDto.getCreator())
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User creator = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG));
 
-        Badge badge = badgeRepository.findBadgeByUid(questRequestDto.getBadge())
+        Badge badge = badgeRepository.findBadgeByUid(createQuestRequestDto.getBadge())
                 .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
 
 
-        Quest quest = questMapper.toQuest(questRequestDto);
+        Quest quest = questMapper.toQuest(createQuestRequestDto);
         quest.setBadge(badge);
         quest.setCreator(creator);
 
-            questRepository.save(quest);
-            log.info("Quest created successfully with id: {}", quest.getUid());
+        questRepository.save(quest);
+        log.info("Quest created successfully with id: {}", quest.getUid());
     }
 
     public Page<QuestResponseDto> getQuestsWithFilter(QuestFilterDto filterDto, Pageable pageable){
@@ -81,16 +84,12 @@ public class QuestService {
         return quests.map(questMapper::toQuestResponseDto);
     }
 
-    public void updateQuest(UUID questUid, QuestRequestToUpdateDto questRequestDto)
+    public void updateQuest(UUID questUid, UpdateQuestRequestDto questRequestDto)
             throws QuestNotFoundException
     {
-        Quest quest = findQuest(questUid);
+        Quest quest = findQuestByUid(questUid);
 
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG));
-
-        if (!quest.getCreator().getUid().equals(currentUser.getUid())) {
+        if (!hasUserAccess(quest.getCreator())) {
             throw new InvalidAccessException(INVALID_ACCESS_MSG);
         }
 
@@ -100,10 +99,12 @@ public class QuestService {
         log.info("Quest updated successfully with id: {}", quest.getUid());
     }
 
-    //I think we need to add check who's gonna delete Quest(It must do only creators or admins)
-    public void deleteQuest(UUID questUid) throws QuestNotFoundException, QuestNotDeletedException {
-        Quest quest = questRepository.findByUid(questUid)
-                .orElseThrow(() -> new QuestNotFoundException(QUEST_NOT_DELETED_MSG));
+    public void deleteQuest(UUID questUid) throws QuestNotFoundException, QuestNotDeletedException, InvalidAccessException {
+        Quest quest = findQuestByUid(questUid);
+
+        if (!hasUserAccess(quest.getCreator())) {
+            throw new InvalidAccessException(INVALID_ACCESS_MSG);
+        }
 
         quest.setIsActive(false);
 
@@ -111,9 +112,19 @@ public class QuestService {
         log.info("Quest deleted successfully with id: {}", quest.getUid());
     }
 
-    private Quest findQuest(UUID questUid) throws QuestNotFoundException {
+    private Quest findQuestByUid(UUID questUid) throws QuestNotFoundException {
         return questRepository.findByUid(questUid)
                 .orElseThrow( () -> new QuestNotFoundException(QUEST_NOT_FOUND_MSG));
+    }
+
+    private boolean hasUserAccess(User creator) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String whoIsTrying = authentication.getName();
+
+        boolean isUserAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("admin"));
+
+        return whoIsTrying.equals(creator.getUsername()) || isUserAdmin;
     }
 
 }

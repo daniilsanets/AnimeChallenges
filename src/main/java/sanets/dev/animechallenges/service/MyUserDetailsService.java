@@ -30,7 +30,7 @@ public class MyUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPasswordHash(),
-                List.of(new SimpleGrantedAuthority(user.getRole().name())));
+                List.of(new SimpleGrantedAuthority(user.getRole().name().toLowerCase())));
     }
 
 }

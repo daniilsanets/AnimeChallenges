@@ -8,8 +8,8 @@ import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.quest.QuestResponseDto;
-import sanets.dev.animechallenges.dto.quest.QuestRequestDto;
-import sanets.dev.animechallenges.dto.quest.QuestRequestToUpdateDto;
+import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
+import sanets.dev.animechallenges.dto.quest.UpdateQuestRequestDto;
 import sanets.dev.animechallenges.model.Quest;
 
 @Mapper(componentModel = "spring",
@@ -32,7 +32,7 @@ public interface QuestMapper {
     @Mapping(target = "isActive" , ignore = true)
     @Mapping(target = "createdAt" , ignore = true)
     @Mapping(target = "updatedAt" , ignore = true)
-    Quest toQuest(QuestRequestDto questRequestDto);
+    Quest toQuest(CreateQuestRequestDto createQuestRequestDto);
 
     //or I can set up like SET_TO_NULL but it will be a full update instead of partly
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -44,7 +44,7 @@ public interface QuestMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    void updateQuestFromDto(QuestRequestToUpdateDto dto, @MappingTarget Quest quest);
+    void updateQuestFromDto(UpdateQuestRequestDto dto, @MappingTarget Quest quest);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
             "createdAt","updatedAt"

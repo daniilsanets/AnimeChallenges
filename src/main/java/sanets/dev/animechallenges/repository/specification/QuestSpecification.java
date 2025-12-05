@@ -18,28 +18,36 @@ public class QuestSpecification {
 
     public static Specification<Quest> isActive(Boolean isActive) {
         return (root, query, cb) -> {
-            if (isActive == null) return null;
+            if (isActive == null) {
+                return null;
+            }
             return cb.equal(root.get("isActive"), isActive);
         };
     }
 
     public static Specification<Quest> hasDifficulty(QuestsDifficulty difficulty) {
         return (root, query, cb) -> {
-            if (difficulty == null) return null;
+            if (difficulty == null) {
+                return null;
+            }
             return cb.equal(root.get("difficulty"), difficulty);
         };
     }
 
     public static Specification<Quest> hasRewardPoints(Integer points) {
         return (root, query, cb) -> {
-            if (points == null) return null;
+            if (points == null) {
+                return null;
+            }
             return cb.equal(root.get("rewardPoints"), points);
         };
     }
 
     public static Specification<Quest> hasMaxAttempts(Integer attempts) {
         return (root, query, cb) -> {
-            if (attempts == null) return null;
+            if (attempts == null) {
+                return null;
+            }
             return cb.equal(root.get("maxAttempts"), attempts);
         };
     }

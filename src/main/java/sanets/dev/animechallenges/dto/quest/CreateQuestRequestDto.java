@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Setter
 @Getter
-public class QuestRequestDto {
+public class CreateQuestRequestDto {
 
     @Length(max = 255)
     @NotBlank
@@ -39,7 +39,4 @@ public class QuestRequestDto {
     @Max(5)
     @NotNull
     private Integer maxAttempts;
-
-    @NotNull
-    private UUID creator;
 }

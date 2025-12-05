@@ -10,8 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import sanets.dev.animechallenges.dto.quest.QuestRequestDto;
-import sanets.dev.animechallenges.dto.quest.QuestRequestToUpdateDto;
+import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
+import sanets.dev.animechallenges.dto.quest.UpdateQuestRequestDto;
 import sanets.dev.animechallenges.exception.common.InvalidAccessException;
 import sanets.dev.animechallenges.mapper.QuestMapper;
 import sanets.dev.animechallenges.model.Badge;
@@ -79,23 +79,25 @@ class QuestServiceTest {
 
     @Test
     void createQuestShouldCreateQuest_whenSuccessfully() {
-        QuestRequestDto questRequestDto = new QuestRequestDto();
-        questRequestDto.setTitle("title");
-        questRequestDto.setDescription("description");
-        questRequestDto.setMaxAttempts(1);
-        questRequestDto.setCreator(creator.getUid());
-        questRequestDto.setBadge(badge.getUid());
-        questRequestDto.setRewardPoints(7);
-        questRequestDto.setDifficulty(QuestsDifficulty.MEDIUM);
+        CreateQuestRequestDto createQuestRequestDto = new CreateQuestRequestDto();
+        createQuestRequestDto.setTitle("title");
+        createQuestRequestDto.setDescription("description");
+        createQuestRequestDto.setMaxAttempts(1);
+        createQuestRequestDto.setBadge(badge.getUid());
+        createQuestRequestDto.setRewardPoints(7);
+        createQuestRequestDto.setDifficulty(QuestsDifficulty.MEDIUM);
 
-
-        when(badgeRepository.findBadgeByUid(questRequestDto.getBadge())).thenReturn(Optional.of(badge));
-        when(userRepository.findById(questRequestDto.getCreator())).thenReturn(Optional.of(creator));
-        when(questMapper.toQuest(questRequestDto)).thenReturn(
+        when(authentication.getName()).thenReturn(creator.getUsername());
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(badgeRepository.findBadgeByUid(createQuestRequestDto.getBadge())).thenReturn(Optional.of(badge));
+        when(userRepository.findByUsername(creator.getUsername())).thenReturn(Optional.of(creator));
+        when(questMapper.toQuest(createQuestRequestDto)).thenReturn(
                 quest
         );
 
-        questService.createQuest(questRequestDto);
+        SecurityContextHolder.setContext(securityContext);
+
+        questService.createQuest(createQuestRequestDto);
 
         verify(questRepository).save(any());
     }
@@ -115,7 +117,7 @@ class QuestServiceTest {
                 .build()));
         SecurityContextHolder.setContext(securityContext);
 
-        assertThrows(InvalidAccessException.class, () -> questService.updateQuest(quest.getUid(), new QuestRequestToUpdateDto()));
+        assertThrows(InvalidAccessException.class, () -> questService.updateQuest(quest.getUid(), new UpdateQuestRequestDto()));
     }
 
     @Test
