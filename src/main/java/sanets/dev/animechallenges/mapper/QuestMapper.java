@@ -18,7 +18,7 @@ import sanets.dev.animechallenges.model.Quest;
 public interface QuestMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
-            "badge", "creator"
+            "badge"
     })
     @Mapping(source = "title", target = "title")
     @Mapping(source = "description", target = "description")

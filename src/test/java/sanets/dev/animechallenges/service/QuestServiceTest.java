@@ -22,6 +22,7 @@ import sanets.dev.animechallenges.repository.BadgeRepository;
 import sanets.dev.animechallenges.repository.QuestRepository;
 import sanets.dev.animechallenges.repository.UserRepository;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -78,28 +79,50 @@ class QuestServiceTest {
     }
 
     @Test
-    void createQuestShouldCreateQuest_whenSuccessfully() {
-        CreateQuestRequestDto createQuestRequestDto = new CreateQuestRequestDto();
-        createQuestRequestDto.setTitle("title");
-        createQuestRequestDto.setDescription("description");
-        createQuestRequestDto.setMaxAttempts(1);
-        createQuestRequestDto.setBadge(badge.getUid());
-        createQuestRequestDto.setRewardPoints(7);
-        createQuestRequestDto.setDifficulty(QuestsDifficulty.MEDIUM);
+    void createQuest_ShouldSaveAndLogCorrectly() {
+        CreateQuestRequestDto dto = new CreateQuestRequestDto();
+        dto.setBadge(badge.getUid());
 
         when(authentication.getName()).thenReturn(creator.getUsername());
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(badgeRepository.findBadgeByUid(createQuestRequestDto.getBadge())).thenReturn(Optional.of(badge));
-        when(userRepository.findByUsername(creator.getUsername())).thenReturn(Optional.of(creator));
-        when(questMapper.toQuest(createQuestRequestDto)).thenReturn(
-                quest
-        );
-
         SecurityContextHolder.setContext(securityContext);
 
-        questService.createQuest(createQuestRequestDto);
+        when(userRepository.findByUsername(creator.getUsername())).thenReturn(Optional.of(creator));
+        when(badgeRepository.findBadgeByUid(dto.getBadge())).thenReturn(Optional.of(badge));
 
-        verify(questRepository).save(any());
+        Quest rawQuest = quest;
+        when(questMapper.toQuest(dto)).thenReturn(rawQuest);
+
+        Quest savedQuest = Quest.builder()
+                .uid(UUID.randomUUID())
+                .title("Saved Title")
+                .creator(creator)
+                .build();
+
+        when(questRepository.save(rawQuest)).thenReturn(savedQuest);
+
+        questService.createQuest(dto);
+
+        verify(questRepository).save(rawQuest);
+    }
+
+    @Test
+    void deleteQuest_ShouldSoftDelete_AndSaveResult() {
+        UUID questId = quest.getUid();
+        quest.setIsActive(true);
+
+        when(questRepository.findByUid(questId)).thenReturn(Optional.of(quest));
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(creator.getUsername());
+        SecurityContextHolder.setContext(securityContext);
+
+        when(questRepository.save(quest)).thenReturn(quest);
+
+        questService.deleteQuest(questId);
+
+        assertFalse(quest.getIsActive());
+        verify(questRepository).save(quest);
     }
 
     @Test
@@ -109,25 +132,19 @@ class QuestServiceTest {
                 .username("Almost danechka")
                 .build();
 
-        when(authentication.getName()).thenReturn(notCreator.getUsername());
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userRepository.findByUsername(any())).thenReturn(Optional.of(notCreator));
-        when(questRepository.findByUid(any())).thenReturn(Optional.of(Quest.builder()
-                        .creator(creator)
-                .build()));
+        when(authentication.getName()).thenReturn(notCreator.getUsername());
+        when(authentication.getAuthorities()).thenReturn(Collections.emptyList());
+
+        Quest existingQuest = Quest.builder()
+                .creator(creator)
+                .build();
+        when(questRepository.findByUid(any())).thenReturn(Optional.of(existingQuest));
         SecurityContextHolder.setContext(securityContext);
 
-        assertThrows(InvalidAccessException.class, () -> questService.updateQuest(quest.getUid(), new UpdateQuestRequestDto()));
+        assertThrows(InvalidAccessException.class,
+                () -> questService.updateQuest(UUID.randomUUID(), new UpdateQuestRequestDto())
+        );
     }
 
-    @Test
-    void deleteQuestShouldSetQuestsActiveFalse_whenSuccessfullyDeleted() {
-        System.out.println(quest.getIsActive());
-        when(questRepository.findByUid(any())).thenReturn(Optional.of(quest));
-
-        questService.deleteQuest(quest.getUid());
-
-        assertFalse(quest.getIsActive());
-        verify(questRepository).save(quest);
-    }
 }

@@ -81,7 +81,7 @@ public class BadgeService {
     }
 
     @Transactional
-    public void processQuestCompletion(User user, Quest quest){
+    public void processQuestCompletion(User user, Quest quest) {
 
         log.debug("Trying to get completed quest number to user {}", user.getUid());
         Long numberOfCompletedQuests = questParticipationRepository.countByPerformerAndQuestStatus(user, QuestStatus.APPROVED);
@@ -108,7 +108,7 @@ public class BadgeService {
     }
 
     @Transactional
-    public void createBadge(BadgeRequestDto  badgeRequestDto, MultipartFile file) throws MediaNotUploadedException {
+    public void createBadge(BadgeRequestDto  badgeRequestDto, MultipartFile file) {
         log.debug("Upload file (badge picture) {} to media db", file.getOriginalFilename());
         Media media = mediaService.upload(file);
 
@@ -129,17 +129,15 @@ public class BadgeService {
     }
 
     public Page<BadgeResponseDto> getBadgesWithFilter(BadgeFilterDto filter, Pageable pageable) {
-        Specification<Badge> spec = Specification.where(null);
-
-        spec = spec.and(nameContains(filter.getNameQuery()))
-                .and(isActive(filter.getIsActive()));
+        Specification<Badge> spec = Specification.where(nameContains(filter.getNameQuery())
+                .and(isActive(filter.getIsActive())));
 
         Page<Badge> badgePage = badgeRepository.findAll(spec, pageable);
 
         return badgePage.map(badgeMapper::toBadgeResponseDto);
     }
 
-    public void deleteBadge(UUID badgeUid) throws BadgeNotFoundException {
+    public void deleteBadge(UUID badgeUid) {
         log.info("Delete badge {}", badgeUid);
         Badge badge = badgeRepository.findBadgeByUid(badgeUid)
                 .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));

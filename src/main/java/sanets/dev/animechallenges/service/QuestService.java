@@ -14,8 +14,6 @@ import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
 import sanets.dev.animechallenges.dto.quest.UpdateQuestRequestDto;
 import sanets.dev.animechallenges.exception.badge.BadgeNotFoundException;
 import sanets.dev.animechallenges.exception.common.InvalidAccessException;
-import sanets.dev.animechallenges.exception.quest.QuestNotCreatedException;
-import sanets.dev.animechallenges.exception.quest.QuestNotDeletedException;
 import sanets.dev.animechallenges.exception.quest.QuestNotFoundException;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.mapper.QuestMapper;
@@ -39,10 +37,9 @@ import static sanets.dev.animechallenges.repository.specification.QuestSpecifica
 @Service
 public class QuestService {
 
-    private static final String BADGE_NOT_FOUND_MSG = "Badge not found";
-    private static final String USER_NOT_FOUND_MSG = "User not found!";
-    private static final String QUEST_NOT_FOUND_MSG = "Quest not found!";
-    private static final String QUEST_NOT_DELETED_MSG = "Quest not deleted!";
+    private static final String BADGE_NOT_FOUND_MSG = "Badge not found in database by id";
+    private static final String USER_NOT_FOUND_MSG = "User not found in database by id";
+    private static final String QUEST_NOT_FOUND_MSG = "Quest not found in  database by id";
     private static final String INVALID_ACCESS_MSG = "Invalid access!";
 
     private final QuestRepository questRepository;
@@ -50,9 +47,7 @@ public class QuestService {
     private final UserRepository userRepository;
     private final QuestMapper questMapper;
 
-    public void createQuest(CreateQuestRequestDto createQuestRequestDto)
-            throws BadgeNotFoundException, UserNotFoundException, QuestNotCreatedException
-    {
+    public void createQuest(CreateQuestRequestDto createQuestRequestDto) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User creator = userRepository.findByUsername(currentUsername)
@@ -66,14 +61,12 @@ public class QuestService {
         quest.setBadge(badge);
         quest.setCreator(creator);
 
-        questRepository.save(quest);
-        log.info("Quest created successfully with id: {}", quest.getUid());
+        Quest savedQuest = questRepository.save(quest);
+        log.info("Quest created successfully with id: {}", savedQuest.getUid());
     }
 
-    public Page<QuestResponseDto> getQuestsWithFilter(QuestFilterDto filterDto, Pageable pageable){
-        Specification<Quest> spec = Specification.where(null);
-
-        spec = spec.and(titleContains(filterDto.getTitle()))
+    public Page<QuestResponseDto> getQuestsWithFilter(QuestFilterDto filterDto, Pageable pageable) {
+        Specification<Quest> spec = Specification.where(titleContains(filterDto.getTitle()))
                 .and(isActive(filterDto.getIsActive()))
                 .and(hasDifficulty(filterDto.getDifficulty()))
                 .and(hasRewardPoints(filterDto.getRewardPoints()))
@@ -84,9 +77,7 @@ public class QuestService {
         return quests.map(questMapper::toQuestResponseDto);
     }
 
-    public void updateQuest(UUID questUid, UpdateQuestRequestDto questRequestDto)
-            throws QuestNotFoundException
-    {
+    public void updateQuest(UUID questUid, UpdateQuestRequestDto questRequestDto) {
         Quest quest = findQuestByUid(questUid);
 
         if (!hasUserAccess(quest.getCreator())) {
@@ -95,11 +86,11 @@ public class QuestService {
 
         questMapper.updateQuestFromDto(questRequestDto, quest);
 
-        questRepository.save(quest);
-        log.info("Quest updated successfully with id: {}", quest.getUid());
+        Quest savedQuest = questRepository.save(quest);
+        log.info("Quest updated successfully with id: {}", savedQuest.getUid());
     }
 
-    public void deleteQuest(UUID questUid) throws QuestNotFoundException, QuestNotDeletedException, InvalidAccessException {
+    public void deleteQuest(UUID questUid) {
         Quest quest = findQuestByUid(questUid);
 
         if (!hasUserAccess(quest.getCreator())) {
@@ -108,11 +99,11 @@ public class QuestService {
 
         quest.setIsActive(false);
 
-        questRepository.save(quest);
-        log.info("Quest deleted successfully with id: {}", quest.getUid());
+        Quest savedQuest = questRepository.save(quest);
+        log.info("Quest deleted successfully with id: {}", savedQuest.getUid());
     }
 
-    private Quest findQuestByUid(UUID questUid) throws QuestNotFoundException {
+    private Quest findQuestByUid(UUID questUid) {
         return questRepository.findByUid(questUid)
                 .orElseThrow( () -> new QuestNotFoundException(QUEST_NOT_FOUND_MSG));
     }
