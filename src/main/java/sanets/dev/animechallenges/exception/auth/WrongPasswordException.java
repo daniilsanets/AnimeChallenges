@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.exception;
+package sanets.dev.animechallenges.exception.auth;
 
 public class WrongPasswordException extends RuntimeException {
     public WrongPasswordException(String message) {

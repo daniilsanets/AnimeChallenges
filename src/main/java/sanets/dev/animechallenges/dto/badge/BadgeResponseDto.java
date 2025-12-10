@@ -1,8 +1,7 @@
-package sanets.dev.animechallenges.dto;
+package sanets.dev.animechallenges.dto.badge;
 
 import lombok.Getter;
 import lombok.Setter;
-import sanets.dev.animechallenges.model.Badge;
 import sanets.dev.animechallenges.model.BadgeType;
 
 import java.util.UUID;

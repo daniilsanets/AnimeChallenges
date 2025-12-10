@@ -9,11 +9,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import sanets.dev.animechallenges.dto.BadgeFilterDto;
-import sanets.dev.animechallenges.dto.BadgeRequestDto;
-import sanets.dev.animechallenges.dto.BadgeResponseDto;
-import sanets.dev.animechallenges.exception.BadgeNotFoundException;
-import sanets.dev.animechallenges.exception.MediaNotUploadedException;
+import sanets.dev.animechallenges.dto.badge.BadgeFilterDto;
+import sanets.dev.animechallenges.dto.badge.BadgeRequestDto;
+import sanets.dev.animechallenges.dto.badge.BadgeResponseDto;
+import sanets.dev.animechallenges.exception.badge.BadgeNotFoundException;
+import sanets.dev.animechallenges.exception.media.MediaNotUploadedException;
 import sanets.dev.animechallenges.mapper.BadgeMapper;
 import sanets.dev.animechallenges.model.Badge;
 import sanets.dev.animechallenges.model.BadgeType;
@@ -29,6 +29,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static sanets.dev.animechallenges.repository.specification.BadgeSpecification.isActive;
+import static sanets.dev.animechallenges.repository.specification.BadgeSpecification.nameContains;
 
 @Slf4j
 @Service
@@ -78,7 +81,7 @@ public class BadgeService {
     }
 
     @Transactional
-    public void processQuestCompletion(User user, Quest quest){
+    public void processQuestCompletion(User user, Quest quest) {
 
         log.debug("Trying to get completed quest number to user {}", user.getUid());
         Long numberOfCompletedQuests = questParticipationRepository.countByPerformerAndQuestStatus(user, QuestStatus.APPROVED);
@@ -105,7 +108,7 @@ public class BadgeService {
     }
 
     @Transactional
-    public void createBadge(BadgeRequestDto  badgeRequestDto, MultipartFile file) throws MediaNotUploadedException {
+    public void createBadge(BadgeRequestDto  badgeRequestDto, MultipartFile file) {
         log.debug("Upload file (badge picture) {} to media db", file.getOriginalFilename());
         Media media = mediaService.upload(file);
 
@@ -126,27 +129,15 @@ public class BadgeService {
     }
 
     public Page<BadgeResponseDto> getBadgesWithFilter(BadgeFilterDto filter, Pageable pageable) {
-        Specification<Badge> spec = (root, query, cb) -> cb.conjunction();
-
-        if (filter.getNameQuery() != null && !filter.getNameQuery().isBlank()){
-            spec = spec.and((root, query, cb) ->
-                    cb.like(cb.lower(root.get("name")), "%" + filter.getNameQuery().toLowerCase() + "%")
-            );
-        }
-
-        log.debug("Filter is null or blank {}", filter.getNameQuery());
-        if (filter.getIsActive() != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("isActive"), filter.getIsActive())
-                    );
-        }
+        Specification<Badge> spec = Specification.where(nameContains(filter.getNameQuery())
+                .and(isActive(filter.getIsActive())));
 
         Page<Badge> badgePage = badgeRepository.findAll(spec, pageable);
 
         return badgePage.map(badgeMapper::toBadgeResponseDto);
     }
 
-    public void deleteBadge(UUID badgeUid) throws BadgeNotFoundException {
+    public void deleteBadge(UUID badgeUid) {
         log.info("Delete badge {}", badgeUid);
         Badge badge = badgeRepository.findBadgeByUid(badgeUid)
                 .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
