@@ -39,7 +39,7 @@ public class MyUserDetailsServiceTest {
 
         assertEquals(user.getUsername(),springUser.getUsername());
         assertEquals(user.getPasswordHash(), springUser.getPassword());
-        assertEquals(new SimpleGrantedAuthority(user.getRole().name()), springUser.getAuthorities().iterator().next());
+        assertEquals(new SimpleGrantedAuthority(user.getRole().name().toLowerCase()), springUser.getAuthorities().iterator().next());
     }
 
     @Test

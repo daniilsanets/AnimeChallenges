@@ -42,7 +42,7 @@ public class BadgeService {
 
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
-    private final QuestParticipationRepository questParticipationRepository;
+    private final QuestParticipationRepository questParticipationRepository; //use a service when it will be present
     private final BadgeMapper badgeMapper;
     private final MediaService mediaService;
 
@@ -147,10 +147,15 @@ public class BadgeService {
         log.info("Badge status was set as not active {}", badgeUid);
     }
 
-    public List<BadgeResponseDto> getUserBadges(UUID userId) {
+    public List<BadgeResponseDto> getUserBadgesByUid(UUID userId) {
         log.info("Get user badges {}", userId);
         return badgeRepository.findAllBadgesByUserId(userId).stream()
                 .map(badgeMapper::toBadgeResponseDto)
                 .toList();
+    }
+
+    public Badge getBadgeByUidOrThrow(UUID badgeUid) {
+        return badgeRepository.findBadgeByUid(badgeUid)
+                .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
     }
 }

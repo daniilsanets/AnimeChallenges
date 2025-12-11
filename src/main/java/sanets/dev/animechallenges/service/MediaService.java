@@ -58,10 +58,14 @@ public class MediaService {
         }
     }
 
+    public Media getMediaByUidOrThrow(UUID mediaUid) {
+        return mediaRepository.findById(mediaUid)
+                .orElseThrow(() -> new MediaNotFoundException(MEDIA_NOT_FOUND_MSG));
+    }
+
     public void delete(UUID mediaId) throws MediaNotFoundException{
         log.debug("Invoke delete media {}", mediaId);
-        Media media = mediaRepository.findById(mediaId)
-                .orElseThrow(() -> new MediaNotFoundException(MEDIA_NOT_FOUND_MSG));
+        Media media = getMediaByUidOrThrow(mediaId);
         log.debug("The media was found");
         String storageKey = media.getStorageKey();
 
@@ -91,7 +95,6 @@ public class MediaService {
 
         String webUrl = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + storageKey;
 
-        //Would you make here mapper for media or just leave it like it was?
         Media media = mediaMapper.toMedia(file, storageKey, webUrl);
 
         try {
