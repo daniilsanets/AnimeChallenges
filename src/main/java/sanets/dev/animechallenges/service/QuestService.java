@@ -19,17 +19,18 @@ import sanets.dev.animechallenges.repository.QuestRepository;
 
 import java.util.UUID;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_NOT_FOUND_MSG;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.hasDifficulty;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.hasMaxAttempts;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.hasRewardPoints;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.isActive;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.titleContains;
+import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccess;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class QuestService {
-    private static final String QUEST_NOT_FOUND_MSG = "Quest not found in  database by id";
 
     private final QuestRepository questRepository;
     private final BadgeService badgeService;
@@ -37,9 +38,9 @@ public class QuestService {
     private final QuestMapper questMapper;
 
     public void createQuest(CreateQuestRequestDto createQuestRequestDto) {
-        User creator = userService.getUserByUidOrThrow(userService.getCurrentUserUid());
+        User creator = userService.getCurrentUser();
 
-        Badge badge = badgeService.getBadgeByUidOrThrow(createQuestRequestDto.getBadge());
+        Badge badge = badgeService.getBadgeByUid(createQuestRequestDto.getBadge());
 
         Quest quest = questMapper.toQuest(createQuestRequestDto);
         quest.setBadge(badge);
@@ -64,7 +65,7 @@ public class QuestService {
     public void updateQuest(UUID questUid, UpdateQuestRequestDto questRequestDto) {
         Quest quest = getQuestByUid(questUid);
 
-        userService.validateUserAccess(quest.getCreator().getUid());
+        validateUserAccess(quest.getCreator().getUsername());
 
         questMapper.updateQuestFromDto(questRequestDto, quest);
 
@@ -72,11 +73,10 @@ public class QuestService {
         log.info("Quest updated successfully with id: {}", savedQuest.getUid());
     }
 
-    //add also delete badge that connect with deleting quest
     public void deleteQuest(UUID questUid) {
         Quest quest = getQuestByUid(questUid);
 
-        userService.validateUserAccess(quest.getCreator().getUid());
+        validateUserAccess(quest.getCreator().getUsername());
 
         quest.setIsActive(false);
 

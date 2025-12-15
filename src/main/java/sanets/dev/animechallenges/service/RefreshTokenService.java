@@ -16,11 +16,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.REFRESH_TOKEN_NOT_FOUND_MSG;
+
 @Slf4j
 @Service
 public class RefreshTokenService {
-
-    private static final String REFRESH_TOKEN_NOT_FOUND_MSG = "Refresh token not found in DB!";
 
     @Value("${jwt.refreshTokenDurationMs}")
     private Long refreshTokenDurationMs;

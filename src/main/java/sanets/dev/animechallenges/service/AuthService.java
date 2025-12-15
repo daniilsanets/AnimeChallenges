@@ -20,16 +20,16 @@ import sanets.dev.animechallenges.repository.UserRepository;
 
 import java.time.OffsetDateTime;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.EMAIL_ALREADY_EXISTS_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.REFRESH_TOKEN_NOT_FOUND_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.USERNAME_ALREADY_EXISTS_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.USER_NOT_FOUND_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.WRONG_PASSWORD_MSG;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
-    private static final String REFRESH_TOKEN_NOT_FOUND_MSG = "Refresh token not found in DB!";
-    private static final String USER_NOT_FOUND_MSG = "User not found in DB!";
-    private static final String WRONG_PASSWORD_MSG = "Wrong password!";
-    private static final String USERNAME_ALREADY_EXISTS_MSG = "Username already exists in DB!";
-    private static final String EMAIL_ALREADY_EXISTS_MSG = "Email already exists in DB!";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

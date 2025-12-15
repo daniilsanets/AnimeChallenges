@@ -20,11 +20,6 @@ public interface QuestMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {
             "badge"
     })
-    @Mapping(source = "title", target = "title")
-    @Mapping(source = "description", target = "description")
-    @Mapping(source = "difficulty", target = "difficulty")
-    @Mapping(source = "rewardPoints", target = "rewardPoints")
-    @Mapping(source = "maxAttempts", target = "maxAttempts")
 
     @Mapping(target = "creator", ignore = true)
     @Mapping(target = "badge", ignore = true)
@@ -49,12 +44,6 @@ public interface QuestMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {
             "createdAt","updatedAt"
     })
-    @Mapping(source = "uid", target ="uid")
-    @Mapping(source = "title", target = "title")
-    @Mapping(source = "description", target = "description")
-    @Mapping(source = "difficulty", target = "difficulty")
-    @Mapping(source = "rewardPoints", target = "rewardPoints")
-    @Mapping(source = "maxAttempts", target = "maxAttempts")
     @Mapping(source = "badge.uid", target = "badgeUid")
     @Mapping(source = "creator.uid", target = "creatorUid")
 

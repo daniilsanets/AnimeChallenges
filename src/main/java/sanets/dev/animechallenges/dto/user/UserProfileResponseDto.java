@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class UserProfileResponceDto {
+public class UserProfileResponseDto {
     private String email;
     private String username;
     private UserRole role;

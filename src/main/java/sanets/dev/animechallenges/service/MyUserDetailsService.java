@@ -11,9 +11,10 @@ import sanets.dev.animechallenges.repository.UserRepository;
 
 import java.util.List;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.USER_NOT_FOUND_MSG;
+
 @Service
 public class MyUserDetailsService implements UserDetailsService {
-    private final static String USER_NOT_FOUND_MSG = "User not found";
 
     private UserRepository userRepository;
 

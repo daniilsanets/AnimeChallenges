@@ -5,7 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
 import sanets.dev.animechallenges.mapper.QuestMapper;
 import sanets.dev.animechallenges.model.Badge;
@@ -13,13 +17,17 @@ import sanets.dev.animechallenges.model.Quest;
 import sanets.dev.animechallenges.model.QuestsDifficulty;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.repository.QuestRepository;
+import sanets.dev.animechallenges.security.SecurityUtils;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class QuestServiceTest {
@@ -32,6 +40,10 @@ class QuestServiceTest {
     private UserService userService;
     @Mock
     private QuestMapper questMapper;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityContext securityContext;
 
     @InjectMocks
     private QuestService questService;
@@ -66,18 +78,20 @@ class QuestServiceTest {
                 .build();
     }
 
+    private void mockSecurityContext(String username) {
+        lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        lenient().when(authentication.getName()).thenReturn(username);
+    }
+
     @Test
     void createQuest_ShouldSaveAndLogCorrectly() {
 
         CreateQuestRequestDto dto = new CreateQuestRequestDto();
         dto.setBadge(badge.getUid());
-        UUID creatorUid = creator.getUid();
 
-        lenient().doNothing().when(userService).validateUserAccess(creatorUid);
-
-        when(userService.getUserByUidOrThrow(any())).thenReturn(creator);
-        when(badgeService.getBadgeByUidOrThrow(any())).thenReturn(badge);
-
+        lenient().when(userService.getUserByUid(any())).thenReturn(creator);
+        when(badgeService.getBadgeByUid(any())).thenReturn(badge);
         when(questMapper.toQuest(dto)).thenReturn(quest);
         when(questRepository.save(quest)).thenReturn(quest);
 
@@ -92,9 +106,14 @@ class QuestServiceTest {
         when(questRepository.findByUid(quest.getUid()))
                 .thenReturn(Optional.of(quest));
 
-        doNothing().when(userService).validateUserAccess(creator.getUid());
+        MockedStatic<SecurityUtils> mockedCall = mockStatic(SecurityUtils.class, invoca -> {
+            return null;
+        });
+
+        mockedCall.close();
 
         when(questRepository.save(quest)).thenReturn(quest);
+        mockSecurityContext("danechka");
 
         questService.deleteQuest(quest.getUid());
 

@@ -8,7 +8,7 @@ import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
-import sanets.dev.animechallenges.dto.user.UserProfileResponceDto;
+import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
 import sanets.dev.animechallenges.model.User;
 
 @Mapper(componentModel = "spring",
@@ -20,14 +20,8 @@ public interface UserMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {
            "uid", "passwordHash", "createdAt", "updatedAt"
     })
-    @Mapping(source = "email", target = "email")
-    @Mapping(source = "username", target = "username")
-    @Mapping(source = "role", target = "role")
-    @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "user.avatar.uid", target = "avatarUid")
-    @Mapping(source = "isActive", target = "isActive")
-    @Mapping(source = "bio", target = "bio")
-    UserProfileResponceDto toUserProfileResponceDto(User user);
+    UserProfileResponseDto toUserProfileResponceDto(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
                  nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)

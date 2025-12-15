@@ -154,7 +154,7 @@ public class BadgeService {
                 .toList();
     }
 
-    public Badge getBadgeByUidOrThrow(UUID badgeUid) {
+    public Badge getBadgeByUid(UUID badgeUid) {
         return badgeRepository.findBadgeByUid(badgeUid)
                 .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
     }
