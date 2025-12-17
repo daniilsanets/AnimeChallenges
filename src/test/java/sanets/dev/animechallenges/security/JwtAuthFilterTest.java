@@ -13,8 +13,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import sanets.dev.animechallenges.model.UserRole;
-import sanets.dev.animechallenges.service.JwtService;
+import sanets.dev.animechallenges.service.MyUserDetailsService;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,7 +27,10 @@ import static org.mockito.Mockito.*;
 class JwtAuthFilterTest {
 
     @Mock
-    JwtService jwtService;
+    JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    MyUserDetailsService userDetailsService;
 
     @InjectMocks
     JwtAuthFilter jwtAuthFilter;
@@ -46,24 +53,33 @@ class JwtAuthFilterTest {
         String role = UserRole.USER.name();
         String token = "some-jwt-token";
 
-        when(request.getHeader("Authorization")).thenReturn("Bearer " +  token);
-        when(jwtService.validateToken(token)).thenReturn(testClaim);
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+
+        when(jwtTokenProvider.validateTokenAndGetClaim(token)).thenReturn(testClaim);
         when(testClaim.getSubject()).thenReturn(username);
-        when(testClaim.get("role")).thenReturn(role);
+
+        UserDetails mockUser = new User(
+                username,
+                "password",
+                List.of(new SimpleGrantedAuthority(role))
+        );
+
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(mockUser);
 
         jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        assertNotNull(authentication);
 
-        assertEquals(new SimpleGrantedAuthority(role), authentication.getAuthorities().iterator().next());
+        assertNotNull(authentication, "Authentication should not be null");
         assertEquals(username, authentication.getName());
+
+        assertEquals(role, authentication.getAuthorities().iterator().next().getAuthority());
+
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
     @Test
     void doInternalFilterTest_whenAuthenticationIsNot() throws Exception {
-
         when(request.getHeader("Authorization")).thenReturn(null);
 
         jwtAuthFilter.doFilterInternal(request, response, filterChain);

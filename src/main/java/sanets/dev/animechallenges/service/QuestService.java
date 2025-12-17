@@ -25,7 +25,8 @@ import static sanets.dev.animechallenges.repository.specification.QuestSpecifica
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.hasRewardPoints;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.isActive;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.titleContains;
-import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccess;
+import static sanets.dev.animechallenges.security.SecurityUtils.getCurrentUserUid;
+import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccessByUsername;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class QuestService {
     private final QuestMapper questMapper;
 
     public void createQuest(CreateQuestRequestDto createQuestRequestDto) {
-        User creator = userService.getCurrentUser();
+        User creator = userService.getUserByUid(getCurrentUserUid());
 
         Badge badge = badgeService.getBadgeByUid(createQuestRequestDto.getBadge());
 
@@ -65,7 +66,7 @@ public class QuestService {
     public void updateQuest(UUID questUid, UpdateQuestRequestDto questRequestDto) {
         Quest quest = getQuestByUid(questUid);
 
-        validateUserAccess(quest.getCreator().getUsername());
+        validateUserAccessByUsername(quest.getCreator().getUsername());
 
         questMapper.updateQuestFromDto(questRequestDto, quest);
 
@@ -76,7 +77,7 @@ public class QuestService {
     public void deleteQuest(UUID questUid) {
         Quest quest = getQuestByUid(questUid);
 
-        validateUserAccess(quest.getCreator().getUsername());
+        validateUserAccessByUsername(quest.getCreator().getUsername());
 
         quest.setIsActive(false);
 

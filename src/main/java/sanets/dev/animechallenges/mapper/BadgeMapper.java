@@ -19,7 +19,6 @@ public interface BadgeMapper {
     @Mapping(source = "image", target = "imageUrl")
     BadgeResponseDto toBadgeResponseDto(Badge badge);
 
-
     @BeanMapping(ignoreUnmappedSourceProperties = {
             "uid", "storageKey", "url", "mimeType", "size", "createdAt", "updatedAt",
             "empty", "bytes", "blank"

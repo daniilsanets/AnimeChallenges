@@ -86,18 +86,22 @@ class QuestServiceTest {
 
     @Test
     void createQuest_ShouldSaveAndLogCorrectly() {
-
         CreateQuestRequestDto dto = new CreateQuestRequestDto();
         dto.setBadge(badge.getUid());
 
-        lenient().when(userService.getUserByUid(any())).thenReturn(creator);
-        when(badgeService.getBadgeByUid(any())).thenReturn(badge);
-        when(questMapper.toQuest(dto)).thenReturn(quest);
-        when(questRepository.save(quest)).thenReturn(quest);
+        try (MockedStatic<SecurityUtils> securityUtilsMock = mockStatic(SecurityUtils.class)) {
 
-        questService.createQuest(dto);
+            securityUtilsMock.when(SecurityUtils::getCurrentUserUid).thenReturn(creator.getUid());
 
-        verify(questRepository).save(quest);
+            lenient().when(userService.getUserByUid(creator.getUid())).thenReturn(creator);
+            when(badgeService.getBadgeByUid(any())).thenReturn(badge);
+            when(questMapper.toQuest(dto)).thenReturn(quest);
+            when(questRepository.save(quest)).thenReturn(quest);
+
+            questService.createQuest(dto);
+
+            verify(questRepository).save(quest);
+        }
     }
 
     @Test
@@ -110,13 +114,12 @@ class QuestServiceTest {
             return null;
         });
 
-        mockedCall.close();
-
         when(questRepository.save(quest)).thenReturn(quest);
         mockSecurityContext("danechka");
 
         questService.deleteQuest(quest.getUid());
 
+        mockedCall.close();
         assertFalse(quest.getIsActive());
         verify(questRepository).save(quest);
     }

@@ -147,8 +147,8 @@ public class BadgeService {
         log.info("Badge status was set as not active {}", badgeUid);
     }
 
-    public List<BadgeResponseDto> getUserBadgesByUid(UUID userId) {
-        log.info("Get user badges {}", userId);
+    public List<BadgeResponseDto> getUserBadgesByUserUid(UUID userId) {
+        log.debug("Get user badges {}", userId);
         return badgeRepository.findAllBadgesByUserId(userId).stream()
                 .map(badgeMapper::toBadgeResponseDto)
                 .toList();

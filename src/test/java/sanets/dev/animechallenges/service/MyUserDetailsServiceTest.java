@@ -6,10 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.model.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
+import sanets.dev.animechallenges.security.UserPrincipal;
 
 import java.util.Optional;
 
@@ -35,7 +37,7 @@ public class MyUserDetailsServiceTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        org.springframework.security.core.userdetails.UserDetails springUser = myUserDetailsService.loadUserByUsername(username);
+        UserDetails springUser = myUserDetailsService.loadUserByUsername(username);
 
         assertEquals(user.getUsername(),springUser.getUsername());
         assertEquals(user.getPasswordHash(), springUser.getPassword());

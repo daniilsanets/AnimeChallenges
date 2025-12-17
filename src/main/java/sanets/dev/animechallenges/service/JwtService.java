@@ -18,7 +18,7 @@ public class JwtService {
 
     public String generateToken(User user){
         log.debug("Jwt generate token");
-        return jwtTokenProvider.generateToken(user.getUsername(), user.getRole().name());
+        return jwtTokenProvider.generateToken(user.getUid(),user.getUsername(), user.getRole().name());
     }
 
     public Claims validateToken(String token){

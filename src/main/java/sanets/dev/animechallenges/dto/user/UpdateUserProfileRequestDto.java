@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 public class UpdateUserProfileRequestDto {
@@ -20,4 +22,6 @@ public class UpdateUserProfileRequestDto {
 
     @Max(1000)
     private String bio;
+
+    private UUID avatarUid;
 }
