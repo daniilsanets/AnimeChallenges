@@ -9,8 +9,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
@@ -44,10 +42,6 @@ class UserServiceTest {
     private MediaService mediaService;
     @Mock
     private UserMapper userMapper;
-    @Mock
-    private Authentication authentication;
-    @Mock
-    private SecurityContext securityContext;
 
     @InjectMocks
     private UserService userService;
@@ -60,13 +54,13 @@ class UserServiceTest {
         currentUser = User.builder()
                 .uid(UUID.randomUUID())
                 .username("danechka")
-                .role(UserRole.ADMIN)
+                .role(UserRole.ROLE_ADMIN)
                 .build();
 
         targetUser = User.builder()
                 .uid(UUID.randomUUID())
                 .username("Almost danechka")
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
     }
 
@@ -79,7 +73,7 @@ class UserServiceTest {
         when(userRepository.findByUid(currentUser.getUid())).thenReturn(Optional.of(currentUser));
         when(userRepository.save(currentUser)).thenReturn(currentUser);
 
-        doNothing().when(userMapper).updateUserProfileFromDto(dto, currentUser, mediaService);
+        doNothing().when(userMapper).updateUserProfileFromDto(dto, currentUser);
 
         when(userMapper.toUserProfileResponseDto(currentUser)).thenReturn(expectedResponse);
 
@@ -90,7 +84,7 @@ class UserServiceTest {
             assertNotNull(result);
 
             verify(userRepository).save(currentUser);
-            verify(userMapper).updateUserProfileFromDto(dto, currentUser, mediaService);
+            verify(userMapper).updateUserProfileFromDto(dto, currentUser);
 
             verify(userMapper).toUserProfileResponseDto(currentUser);
 
@@ -153,36 +147,15 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUserByUid_ShouldThrowInvalidAccessException_WhenIsNotAdmin() {
-        UUID targetUid = targetUser.getUid();
-
-        try (MockedStatic<SecurityUtils> securityUtilsMock = Mockito.mockStatic(SecurityUtils.class)) {
-
-            securityUtilsMock.when(SecurityUtils::isAdmin).thenReturn(false);
-
-            assertThrows(InvalidAccessException.class,
-                    () -> userService.deleteUserByUid(targetUid));
-
-            verify(userRepository, never()).delete(any());
-            verify(userRepository, never()).existsById(any());
-        }
-    }
-
-    @Test
     void deleteUserByUid_ShouldThrowUserNotFoundException_WhenUserNotFound() {
         UUID targetUid = UUID.randomUUID();
+        currentUser.setRole(UserRole.ROLE_ADMIN);
 
-        try (MockedStatic<SecurityUtils> securityUtilsMock = Mockito.mockStatic(SecurityUtils.class)) {
+        when(userRepository.existsById(targetUid)).thenReturn(false);
+        assertThrows(UserNotFoundException.class,
+                () -> userService.deleteUserByUid(targetUid));
 
-            securityUtilsMock.when(SecurityUtils::isAdmin).thenReturn(true);
-
-            when(userRepository.existsById(targetUid)).thenReturn(false);
-
-            assertThrows(UserNotFoundException.class,
-                    () -> userService.deleteUserByUid(targetUid));
-
-            verify(userRepository, never()).delete(any());
-        }
+        verify(userRepository, never()).delete(any());
     }
 
     @AfterEach

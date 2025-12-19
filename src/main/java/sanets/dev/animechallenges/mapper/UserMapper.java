@@ -23,28 +23,22 @@ import java.util.UUID;
 public interface UserMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
-           "uid", "passwordHash", "createdAt", "updatedAt"
+           "uid", "passwordHash", "createdAt", "updatedAt",
     })
     @Mapping(source = "user.avatar.uid", target = "avatarUid")
     UserProfileResponseDto toUserProfileResponseDto(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-                 nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+                 nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+                ignoreUnmappedSourceProperties = {
+                        "avatarUid"
+                })
     @Mapping(target = "uid", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt" , ignore = true)
-    @Mapping(source = "avatarUid", target = "avatar")
-    void updateUserProfileFromDto(UpdateUserProfileRequestDto userProfileRequestDto,
-                                  @MappingTarget User user,
-                                  @Context MediaService mediaService);
-
-    default Media mapMediaUidToMedia(UUID mediaUid, @Context MediaService mediaService) {
-        if (mediaUid == null) {
-            return null;
-        }
-        return mediaService.getMediaByUid(mediaUid);
-    }
+    @Mapping(target = "avatar", ignore = true)
+    void updateUserProfileFromDto(UpdateUserProfileRequestDto userProfileRequestDto, @MappingTarget User user);
 }

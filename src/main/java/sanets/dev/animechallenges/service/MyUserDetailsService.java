@@ -32,7 +32,7 @@ public class MyUserDetailsService implements UserDetailsService {
                 user.getUid(),
                 user.getUsername(),
                 user.getPasswordHash(),
-                List.of(new SimpleGrantedAuthority(user.getRole().name().toLowerCase())));
+                List.of(new SimpleGrantedAuthority(user.getRole().name())));
     }
 
 }

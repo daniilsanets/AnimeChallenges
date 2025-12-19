@@ -93,7 +93,7 @@ class AuthServiceTest {
         User user = User.builder()
                 .username(inputUsernameOrEmail)
                 .passwordHash(correctHashedPassword)
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
 
         RefreshToken mockRefreshToken = RefreshToken.builder()
@@ -128,7 +128,7 @@ class AuthServiceTest {
                 .username("newUser")
                 .email("new@example.com")
                 .passwordHash(hashedPassword)
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
 
         when(passwordEncoder.encode(rawPassword)).thenReturn(hashedPassword);
@@ -137,7 +137,7 @@ class AuthServiceTest {
         when(authMapper.signupDtoToUser(
                 eq(signUpRequestDto),
                 eq(hashedPassword),
-                eq(UserRole.USER),
+                eq(UserRole.ROLE_USER),
                 any(OffsetDateTime.class)
         )).thenReturn(userFromMapper);
 

@@ -53,7 +53,7 @@ public class AuthService {
         }
         
         String hashedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
-        UserRole roleToAssign = UserRole.USER;
+        UserRole roleToAssign = UserRole.ROLE_USER;
         OffsetDateTime now = OffsetDateTime.now();
 
         log.debug("Map signupDto to user: {}", signUpRequestDto.getUsername());

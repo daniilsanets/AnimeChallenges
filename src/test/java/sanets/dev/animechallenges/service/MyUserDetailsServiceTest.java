@@ -11,7 +11,6 @@ import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.model.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
-import sanets.dev.animechallenges.security.UserPrincipal;
 
 import java.util.Optional;
 
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class MyUserDetailsServiceTest {
+class MyUserDetailsServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -33,7 +32,7 @@ public class MyUserDetailsServiceTest {
         String username = "username";
         String passwordHash = "passwordHash";
 
-        User user = User.builder().username(username).passwordHash(passwordHash).role(UserRole.USER).build();
+        User user = User.builder().username(username).passwordHash(passwordHash).role(UserRole.ROLE_USER).build();
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -41,7 +40,7 @@ public class MyUserDetailsServiceTest {
 
         assertEquals(user.getUsername(),springUser.getUsername());
         assertEquals(user.getPasswordHash(), springUser.getPassword());
-        assertEquals(new SimpleGrantedAuthority(user.getRole().name().toLowerCase()), springUser.getAuthorities().iterator().next());
+        assertEquals(new SimpleGrantedAuthority(user.getRole().name()), springUser.getAuthorities().iterator().next());
     }
 
     @Test

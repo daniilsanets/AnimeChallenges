@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,7 +56,9 @@ public class BadgeService {
         return saveBadgeToUser(user, badge, false);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean saveBadgeToUser(User user, Badge badge, boolean forced) {
+
         if (userHasBadge(user, badge) && !forced) {
             log.debug("User {} badge {} not saved because it has badge", user.getUid(), badge);
             return false;

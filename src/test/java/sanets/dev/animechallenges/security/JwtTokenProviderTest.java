@@ -31,7 +31,7 @@ class JwtTokenProviderTest {
                 .uid(userUid)
                 .username(username)
                 .passwordHash(correctHashedPassword)
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
 
         String generatedToken = jwtTokenProvider.generateToken(testUser.getUid(), testUser.getUsername(), testUser.getRole().name());

@@ -2,7 +2,7 @@
 
 --changeset daniilsanets:002-1
 --comment Create user_roles enum type
-CREATE TYPE user_roles AS ENUM ('GUEST','USER','ADMIN');
+CREATE TYPE user_roles AS ENUM ('GUEST','ROLE_USER','ROLE_ADMIN');
 --rollback DROP TYPE user_roles;
 
 --changeset daniilsanets:002-2
@@ -48,4 +48,4 @@ ALTER COLUMN role TYPE VARCHAR(50)
 --changeset daniilsanets:002-6
 --comment Drop obsolete enum type user_roles
 DROP TYPE IF EXISTS user_roles;
---rollback CREATE TYPE user_roles AS ENUM ('GUEST','USER','ADMIN');
+--rollback CREATE TYPE user_roles AS ENUM ('GUEST','ROLE_USER','ROLE_ADMIN');
