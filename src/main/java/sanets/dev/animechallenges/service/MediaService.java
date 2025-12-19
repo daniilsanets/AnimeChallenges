@@ -20,14 +20,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.DIRECTORY_NOT_CREATED_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.MEDIA_NOT_DELETED_FROM_SERVER_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.MEDIA_NOT_FOUND_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.MEDIA_NOT_UPLOADED_TO_SERVER_MSG;
+
 @Service
 @Slf4j
 public class MediaService {
-
-    private static final String MEDIA_NOT_FOUND_MSG = "Media not found";
-    private static final String MEDIA_NOT_UPLOADED_TO_SERVER_MSG = "Media not uploaded to server storage";
-    private static final String MEDIA_NOT_DELETED_FROM_SERVER_MSG = "Media not deleted from server storage";
-    private static final String DIRECTORY_NOT_CREATED_MSG = "Could not initialize storage location";
 
     private final String uploadDir;
     private final String baseUrl;
@@ -58,10 +58,14 @@ public class MediaService {
         }
     }
 
+    public Media getMediaByUid(UUID mediaUid) {
+        return mediaRepository.findById(mediaUid)
+                .orElseThrow(() -> new MediaNotFoundException(MEDIA_NOT_FOUND_MSG));
+    }
+
     public void delete(UUID mediaId) throws MediaNotFoundException{
         log.debug("Invoke delete media {}", mediaId);
-        Media media = mediaRepository.findById(mediaId)
-                .orElseThrow(() -> new MediaNotFoundException(MEDIA_NOT_FOUND_MSG));
+        Media media = getMediaByUid(mediaId);
         log.debug("The media was found");
         String storageKey = media.getStorageKey();
 
@@ -91,7 +95,6 @@ public class MediaService {
 
         String webUrl = baseUrl + (baseUrl.endsWith("/") ? "" : "/") + storageKey;
 
-        //Would you make here mapper for media or just leave it like it was?
         Media media = mediaMapper.toMedia(file, storageKey, webUrl);
 
         try {

@@ -13,17 +13,29 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import sanets.dev.animechallenges.model.UserRole;
-import sanets.dev.animechallenges.service.JwtService;
+import sanets.dev.animechallenges.service.MyUserDetailsService;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
-public class JwtAuthFilterTest {
+class JwtAuthFilterTest {
 
     @Mock
-    JwtService jwtService;
+    JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    MyUserDetailsService userDetailsService;
 
     @InjectMocks
     JwtAuthFilter jwtAuthFilter;
@@ -43,27 +55,36 @@ public class JwtAuthFilterTest {
     @Test
     void doInternalFilterTest() throws Exception {
         String username = "some-username";
-        String role = UserRole.USER.name();
+        String role = UserRole.ROLE_USER.name();
         String token = "some-jwt-token";
 
-        when(request.getHeader("Authorization")).thenReturn("Bearer " +  token);
-        when(jwtService.validateToken(token)).thenReturn(testClaim);
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+
+        when(jwtTokenProvider.validateTokenAndGetClaim(token)).thenReturn(testClaim);
         when(testClaim.getSubject()).thenReturn(username);
-        when(testClaim.get("role")).thenReturn(role);
+
+        UserDetails mockUser = new User(
+                username,
+                "password",
+                List.of(new SimpleGrantedAuthority(role))
+        );
+
+        when(userDetailsService.loadUserByUsername(username)).thenReturn(mockUser);
 
         jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        assertNotNull(authentication);
 
-        assertEquals(new SimpleGrantedAuthority(role), authentication.getAuthorities().iterator().next());
+        assertNotNull(authentication, "Authentication should not be null");
         assertEquals(username, authentication.getName());
+
+        assertEquals(role, authentication.getAuthorities().iterator().next().getAuthority());
+
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
     @Test
     void doInternalFilterTest_whenAuthenticationIsNot() throws Exception {
-
         when(request.getHeader("Authorization")).thenReturn(null);
 
         jwtAuthFilter.doFilterInternal(request, response, filterChain);

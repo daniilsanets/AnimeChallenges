@@ -7,10 +7,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 import sanets.dev.animechallenges.model.User;
 import sanets.dev.animechallenges.model.UserRole;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-public class JwtTokenProviderTest {
+class JwtTokenProviderTest {
     JwtTokenProvider jwtTokenProvider =  new JwtTokenProvider();
 
     @BeforeEach
@@ -22,21 +24,23 @@ public class JwtTokenProviderTest {
     @Test
     void generateToken(){
         String username = "username";
-        String password = "password";
+        UUID userUid = UUID.randomUUID();
         String correctHashedPassword = "correctHashedPassword";
 
         User testUser = User.builder()
+                .uid(userUid)
                 .username(username)
                 .passwordHash(correctHashedPassword)
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
 
-        String generatedToken = jwtTokenProvider.generateToken(testUser.getUsername(), testUser.getRole().name());
+        String generatedToken = jwtTokenProvider.generateToken(testUser.getUid(), testUser.getUsername(), testUser.getRole().name());
 
         Claims claim = jwtTokenProvider.validateTokenAndGetClaim(generatedToken);
         System.out.println(claim);
 
         assertEquals(testUser.getUsername(), claim.getSubject());
+        assertEquals(testUser.getUid().toString(), claim.get("uid"));
         assertEquals(testUser.getRole().name(), claim.get("role"));
     }
 }

@@ -5,6 +5,8 @@ spring:
         url: jdbc:postgresql://localhost:5432/anime_challenges
         username: postgres
         password: password
+    main:
+        banner-mode: off
 
 jwt:
     secretKey: xyzqhpQYnQtFXqigYEeefzwxsglwfqbnAdvhNdQPrBwIVIRKgyzZiiSraYMwslij

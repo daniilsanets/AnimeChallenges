@@ -12,8 +12,6 @@ import java.time.OffsetDateTime;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, unmappedSourcePolicy = ReportingPolicy.ERROR)
 public interface AuthMapper {
 
-    @Mapping(target = "passwordHash", source = "passwordHash")
-    @Mapping(target = "role", source = "role")
     @Mapping(target = "createdAt", source = "now")
     @Mapping(target = "updatedAt", ignore = true)
 

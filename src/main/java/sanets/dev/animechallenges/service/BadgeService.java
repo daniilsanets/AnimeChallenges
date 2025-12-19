@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +43,7 @@ public class BadgeService {
 
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
-    private final QuestParticipationRepository questParticipationRepository;
+    private final QuestParticipationRepository questParticipationRepository; //use a service when it will be present
     private final BadgeMapper badgeMapper;
     private final MediaService mediaService;
 
@@ -55,7 +56,9 @@ public class BadgeService {
         return saveBadgeToUser(user, badge, false);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean saveBadgeToUser(User user, Badge badge, boolean forced) {
+
         if (userHasBadge(user, badge) && !forced) {
             log.debug("User {} badge {} not saved because it has badge", user.getUid(), badge);
             return false;
@@ -147,10 +150,15 @@ public class BadgeService {
         log.info("Badge status was set as not active {}", badgeUid);
     }
 
-    public List<BadgeResponseDto> getUserBadges(UUID userId) {
-        log.info("Get user badges {}", userId);
+    public List<BadgeResponseDto> getUserBadgesByUserUid(UUID userId) {
+        log.debug("Get user badges {}", userId);
         return badgeRepository.findAllBadgesByUserId(userId).stream()
                 .map(badgeMapper::toBadgeResponseDto)
                 .toList();
+    }
+
+    public Badge getBadgeByUid(UUID badgeUid) {
+        return badgeRepository.findBadgeByUid(badgeUid)
+                .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
     }
 }

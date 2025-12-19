@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+class AuthServiceTest {
 
     @Mock
     UserRepository userRepository;
@@ -93,7 +93,7 @@ public class AuthServiceTest {
         User user = User.builder()
                 .username(inputUsernameOrEmail)
                 .passwordHash(correctHashedPassword)
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
 
         RefreshToken mockRefreshToken = RefreshToken.builder()
@@ -128,17 +128,16 @@ public class AuthServiceTest {
                 .username("newUser")
                 .email("new@example.com")
                 .passwordHash(hashedPassword)
-                .role(UserRole.USER)
+                .role(UserRole.ROLE_USER)
                 .build();
 
-        // 3. Настраиваем моки
         when(passwordEncoder.encode(rawPassword)).thenReturn(hashedPassword);
 
 
         when(authMapper.signupDtoToUser(
                 eq(signUpRequestDto),
                 eq(hashedPassword),
-                eq(UserRole.USER),
+                eq(UserRole.ROLE_USER),
                 any(OffsetDateTime.class)
         )).thenReturn(userFromMapper);
 

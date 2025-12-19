@@ -5,57 +5,43 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.quest.QuestResponseDto;
 import sanets.dev.animechallenges.dto.quest.QuestFilterDto;
 import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
 import sanets.dev.animechallenges.dto.quest.UpdateQuestRequestDto;
-import sanets.dev.animechallenges.exception.badge.BadgeNotFoundException;
-import sanets.dev.animechallenges.exception.common.InvalidAccessException;
 import sanets.dev.animechallenges.exception.quest.QuestNotFoundException;
-import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.mapper.QuestMapper;
 import sanets.dev.animechallenges.model.Badge;
 import sanets.dev.animechallenges.model.Quest;
 import sanets.dev.animechallenges.model.User;
-import sanets.dev.animechallenges.repository.BadgeRepository;
 import sanets.dev.animechallenges.repository.QuestRepository;
-import sanets.dev.animechallenges.repository.UserRepository;
 
 import java.util.UUID;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_NOT_FOUND_MSG;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.hasDifficulty;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.hasMaxAttempts;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.hasRewardPoints;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.isActive;
 import static sanets.dev.animechallenges.repository.specification.QuestSpecification.titleContains;
+import static sanets.dev.animechallenges.security.SecurityUtils.getCurrentUserUid;
+import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccessByUsername;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class QuestService {
 
-    private static final String BADGE_NOT_FOUND_MSG = "Badge not found in database by id";
-    private static final String USER_NOT_FOUND_MSG = "User not found in database by id";
-    private static final String QUEST_NOT_FOUND_MSG = "Quest not found in  database by id";
-    private static final String INVALID_ACCESS_MSG = "Invalid access!";
-
     private final QuestRepository questRepository;
-    private final BadgeRepository badgeRepository;
-    private final UserRepository userRepository;
+    private final BadgeService badgeService;
+    private final UserService userService;
     private final QuestMapper questMapper;
 
     public void createQuest(CreateQuestRequestDto createQuestRequestDto) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User creator = userService.getUserByUid(getCurrentUserUid());
 
-        User creator = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_MSG));
-
-        Badge badge = badgeRepository.findBadgeByUid(createQuestRequestDto.getBadge())
-                .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
-
+        Badge badge = badgeService.getBadgeByUid(createQuestRequestDto.getBadge());
 
         Quest quest = questMapper.toQuest(createQuestRequestDto);
         quest.setBadge(badge);
@@ -78,11 +64,9 @@ public class QuestService {
     }
 
     public void updateQuest(UUID questUid, UpdateQuestRequestDto questRequestDto) {
-        Quest quest = findQuestByUid(questUid);
+        Quest quest = getQuestByUid(questUid);
 
-        if (!hasUserAccess(quest.getCreator())) {
-            throw new InvalidAccessException(INVALID_ACCESS_MSG);
-        }
+        validateUserAccessByUsername(quest.getCreator().getUsername());
 
         questMapper.updateQuestFromDto(questRequestDto, quest);
 
@@ -91,11 +75,9 @@ public class QuestService {
     }
 
     public void deleteQuest(UUID questUid) {
-        Quest quest = findQuestByUid(questUid);
+        Quest quest = getQuestByUid(questUid);
 
-        if (!hasUserAccess(quest.getCreator())) {
-            throw new InvalidAccessException(INVALID_ACCESS_MSG);
-        }
+        validateUserAccessByUsername(quest.getCreator().getUsername());
 
         quest.setIsActive(false);
 
@@ -103,19 +85,9 @@ public class QuestService {
         log.info("Quest deleted successfully with id: {}", savedQuest.getUid());
     }
 
-    private Quest findQuestByUid(UUID questUid) {
+    private Quest getQuestByUid(UUID questUid) {
         return questRepository.findByUid(questUid)
                 .orElseThrow( () -> new QuestNotFoundException(QUEST_NOT_FOUND_MSG));
-    }
-
-    private boolean hasUserAccess(User creator) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String whoIsTrying = authentication.getName();
-
-        boolean isUserAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("admin"));
-
-        return whoIsTrying.equals(creator.getUsername()) || isUserAdmin;
     }
 
 }

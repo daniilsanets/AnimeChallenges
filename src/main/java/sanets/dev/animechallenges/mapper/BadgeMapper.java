@@ -14,19 +14,16 @@ import sanets.dev.animechallenges.model.Media;
 public interface BadgeMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
-            "code", "rule", "active", "createdAt", "updatedAt"
+            "uid","code", "rule", "active", "createdAt", "updatedAt"
     })
-    @Mapping(target = "uid", source = "uid", ignore = true)
     @Mapping(source = "image", target = "imageUrl")
     BadgeResponseDto toBadgeResponseDto(Badge badge);
-
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
             "uid", "storageKey", "url", "mimeType", "size", "createdAt", "updatedAt",
             "empty", "bytes", "blank"
     })
     @Mapping(source = "media", target = "image")
-    @Mapping(source = "code", target = "code")
     @Mapping(target = "isActive", constant = "true")
     @Mapping(target = "uid", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

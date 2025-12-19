@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtTokenProvider {
@@ -18,7 +19,7 @@ public class JwtTokenProvider {
     @Value("${jwt.lifetime}")
     private int lifetime;
 
-    public String generateToken(String username, String role){
+    public String generateToken(UUID userUid, String username, String role){
 
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
@@ -31,6 +32,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("uid", userUid.toString())
                 .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(exp)
