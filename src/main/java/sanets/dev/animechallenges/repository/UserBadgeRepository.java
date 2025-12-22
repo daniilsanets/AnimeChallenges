@@ -15,12 +15,12 @@ public interface UserBadgeRepository extends JpaRepository<UserBadge, UUID> {
     Optional<UserBadge> findByUserUidAndBadgeUid(UUID userUid, UUID badgeUid);
 
     @Query("SELECT ub.badge.uid FROM UserBadge ub WHERE ub.user.uid = :userId")
-    Set<UUID> findBadgeIdsByUser(@Param("userId") UUID userId);
+    Set<UUID> findBadgeIdsByUser(@Param("userUid") UUID userId);
 
     @Modifying()
     @Query(value = "INSERT INTO user_badge(user_uid, badge_uid, awarded_at) VALUES (:userId, :badgeId, :awardedAt) ON CONFLICT (user_uid, badge_uid) DO NOTHING",
     nativeQuery = true)
-    int insertUserBadge(@Param("userId") UUID userUid,
+    int insertUserBadge(@Param("userUid") UUID userUid,
                          @Param("badgeId") UUID badgeUid,
                          @Param("awardedAt") OffsetDateTime awardedAt);
 

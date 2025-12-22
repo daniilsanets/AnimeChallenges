@@ -16,7 +16,11 @@ public class ErrorMessages {
     public static final String DIRECTORY_NOT_CREATED_MSG = "Could not initialize storage location";
 
     public static final String QUEST_NOT_FOUND_MSG = "Quest not found in  database by id";
-
+    public static final String QUEST_NOT_AVAILABLE_MSG = "Quest not available in DB!";
 
     public static final String REFRESH_TOKEN_NOT_FOUND_MSG = "Refresh token not found in DB!";
+
+    public static final String QUEST_PARTICIPATION_NOT_FOUND_MSG = "Quest participation not found in DB!";
+
+    public static final String ALREADY_PARTICIPATING_MSG = "You are already in :)";
 }

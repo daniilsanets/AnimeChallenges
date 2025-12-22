@@ -25,5 +25,5 @@ public interface BadgeRepository extends JpaRepository<Badge, UUID>, JpaSpecific
     LEFT JOIN FETCH b.image 
     WHERE ub.user.uid = :userId
 """)
-    List<Badge> findAllBadgesByUserId(@Param("userId") UUID userId);
+    List<Badge> findAllBadgesByUserId(@Param("userUid") UUID userId);
 }
