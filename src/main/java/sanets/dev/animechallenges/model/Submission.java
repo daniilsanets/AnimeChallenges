@@ -47,9 +47,9 @@ public class Submission {
     private QuestParticipation questParticipation;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "submission_type", nullable = false, columnDefinition = "submission_status")
+    @Column(name = "submission_type", nullable = false, columnDefinition = "submission_type")
     @NotNull
-    private SubmissionStatus submissionStatus;
+    private SubmissionType submissionType;
 
     @Column(name = "description", nullable = false, columnDefinition = "TEXT", length = 5000)
     @NotNull

@@ -23,4 +23,6 @@ public class ErrorMessages {
     public static final String QUEST_PARTICIPATION_NOT_FOUND_MSG = "Quest participation not found in DB!";
 
     public static final String ALREADY_PARTICIPATING_MSG = "You are already in :)";
+
+    public static final String SUBMISSION_NOT_FOUND_MSG = "Submission not found in database by id";
 }

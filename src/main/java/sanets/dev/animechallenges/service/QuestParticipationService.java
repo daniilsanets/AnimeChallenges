@@ -95,7 +95,7 @@ public class QuestParticipationService {
         questParticipationRepository.save(participationToDelete);
     }
 
-    private QuestParticipation getQuestParticipationByUid(UUID questParticipation) {
+    public QuestParticipation getQuestParticipationByUid(UUID questParticipation) {
         return questParticipationRepository.findQuestParticipationByUid(questParticipation)
                 .orElseThrow(() -> new ParticipationNotFoundException(QUEST_PARTICIPATION_NOT_FOUND_MSG));
     }

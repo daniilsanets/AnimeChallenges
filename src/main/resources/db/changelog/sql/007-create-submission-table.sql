@@ -29,3 +29,8 @@ ALTER TABLE submission
             REFERENCES quest_participation(uid)
             ON DELETE CASCADE;
 --rollback ALTER TABLE submission DROP CONSTRAINT fk_submission_participation_uid;
+
+--changeset daniilsanets:007-4
+--comment Rename submission_status enum to submission_type
+ALTER TYPE submission_status RENAME TO submission_type;
+--rollback ALTER TYPE submission_type RENAME TO submission_status;
