@@ -1,7 +1,6 @@
 package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.participation.UpdateQuestParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.CreateParticipationRequestDto;
@@ -36,7 +35,6 @@ public class QuestParticipationService {
     private final QuestService questService;
     private final QuestParticipationMapper questParticipationMapper;
 
-    /// Do I need to add mapper to this(because I take only one field from dto ) i mean from CreateParticipationRequestDto
     public QuestParticipationResponseDto createQuestParticipation(CreateParticipationRequestDto dto) {
         Quest questToParticipate = questService.getQuestByUid(dto.getQuestUid());
 
@@ -44,18 +42,14 @@ public class QuestParticipationService {
 
         validateCanParticipate(currentUser, questToParticipate);
 
-        QuestParticipation participation = QuestParticipation.builder()
-                .performer(currentUser)
-                .quest(questToParticipate)
-                .questStatus(QuestStatus.PENDING)
-                .build();
+        QuestParticipation participation = questParticipationMapper.toQuestParticipation(currentUser, questToParticipate, dto.getScore());
+        participation.setQuestStatus(QuestStatus.PENDING);
 
         questParticipationRepository.save(participation);
 
         return questParticipationMapper.toQuestParticipationResponseDto(participation);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public List<QuestParticipation> getAllQuestParticipationByUserUid(UUID userUid) {
        return questParticipationRepository.findAllByPerformerUid(userUid);
     }
@@ -95,7 +89,6 @@ public class QuestParticipationService {
                 .orElseThrow(() -> new ParticipationNotFoundException(QUEST_PARTICIPATION_NOT_FOUND_MSG));
     }
 
-    /// Maybe we need a limit for quantity users who can participate (Participation limit)
     private void validateCanParticipate(User user, Quest quest){
         if (questParticipationRepository.existsByPerformerAndQuest(user, quest)){
             throw new AlreadyParticipatingException(ALREADY_PARTICIPATING_MSG);

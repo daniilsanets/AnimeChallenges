@@ -107,7 +107,8 @@ class QuestParticipationServiceTest {
         when(userService.getUserByUid(user.getUid())).thenReturn(user);
         when(questParticipationRepository.existsByPerformerAndQuest(user, quest)).thenReturn(false);
         when(questParticipationRepository.save(any(QuestParticipation.class))).thenReturn(participation);
-
+        when(questParticipationMapper.toQuestParticipation(any(User.class), any(Quest.class), any()))
+                .thenReturn(participation);
         when(questParticipationMapper.toQuestParticipationResponseDto(any(QuestParticipation.class)))
                 .thenReturn(expectedResponse);
 

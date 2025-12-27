@@ -2,12 +2,10 @@ package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
-import sanets.dev.animechallenges.exception.common.InvalidAccessException;
 import sanets.dev.animechallenges.mapper.UserMapper;
 import sanets.dev.animechallenges.model.Media;
 import sanets.dev.animechallenges.model.User;
@@ -49,7 +47,6 @@ public class UserService {
         return userMapper.toUserProfileResponseDto(user);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserByUid(UUID userUid) {
 
         if(!userRepository.existsById(userUid)){

@@ -4,22 +4,20 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.participation.UpdateQuestParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.QuestParticipationResponseDto;
+import sanets.dev.animechallenges.model.Quest;
 import sanets.dev.animechallenges.model.QuestParticipation;
+import sanets.dev.animechallenges.model.QuestStatus;
+import sanets.dev.animechallenges.model.User;
 
 @Mapper(componentModel = "spring",
     unmappedSourcePolicy = ReportingPolicy.ERROR,
     unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface QuestParticipationMapper {
 
-    @BeanMapping(
-            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-            nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-            ignoreUnmappedSourceProperties = {
+    @BeanMapping(ignoreUnmappedSourceProperties = {
                     "participationUid"
             })
     @Mapping(target = "uid", ignore = true)
@@ -38,4 +36,19 @@ public interface QuestParticipationMapper {
     @Mapping(source = "performer.uid", target = "userUid")
     @Mapping(source = "quest.uid", target = "questUid")
     QuestParticipationResponseDto toQuestParticipationResponseDto(QuestParticipation questParticipation);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {
+            "email", "username", "passwordHash", "role", "nickname",
+            "avatar", "bio", "isActive", "createdAt", "updatedAt", "title", "description", "difficulty",
+            "rewardPoints", "badge", "maxAttempts", "creator"
+    })
+    @Mapping(target = "uid", ignore = true)
+    @Mapping(target = "startedAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "questStatus", ignore = true)
+    @Mapping(target = "performer", source = "currentUser")
+//    @Mapping(source = "quest", target = "quest")
+//    @Mapping(source = "score", target = "score")
+    QuestParticipation toQuestParticipation(User currentUser, Quest quest, Integer score);
 }

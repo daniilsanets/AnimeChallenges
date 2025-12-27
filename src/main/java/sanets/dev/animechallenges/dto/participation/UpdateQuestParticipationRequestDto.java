@@ -14,6 +14,7 @@ public class UpdateQuestParticipationRequestDto {
     @NotNull
     private UUID participationUid;
 
+    @NotNull
     private QuestStatus questStatus;
 
     @Min(0)
