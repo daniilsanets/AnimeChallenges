@@ -1,7 +1,6 @@
 package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionResponseDto;
@@ -26,7 +25,6 @@ public class SubmissionService {
     private final QuestParticipationService questParticipationService;
     private final SubmissionMapper submissionMapper;
 
-    @PreAuthorize("hasRole('ADMIN')")
     public CreateSubmissionResponseDto createSubmission(CreateSubmissionRequestDto dto) {
 
         QuestParticipation participation = questParticipationService.getQuestParticipationByUid(dto.getParticipationUid());
@@ -38,7 +36,6 @@ public class SubmissionService {
         return submissionMapper.toCreateSubmissionResponseDto(submission);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public Submission getSubmissionByUid(UUID submissionUid){
         return submissionRepository.findByUid(submissionUid)
                 .orElseThrow(() -> new SubmissionNotFoundException(SUBMISSION_NOT_FOUND_MSG));
