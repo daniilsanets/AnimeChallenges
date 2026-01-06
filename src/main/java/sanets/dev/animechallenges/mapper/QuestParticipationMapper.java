@@ -48,7 +48,5 @@ public interface QuestParticipationMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "questStatus", ignore = true)
     @Mapping(target = "performer", source = "currentUser")
-//    @Mapping(source = "quest", target = "quest")
-//    @Mapping(source = "score", target = "score")
     QuestParticipation toQuestParticipation(User currentUser, Quest quest, Integer score);
 }

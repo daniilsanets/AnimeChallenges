@@ -1,6 +1,7 @@
 package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.participation.UpdateQuestParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.CreateParticipationRequestDto;
@@ -20,12 +21,19 @@ import sanets.dev.animechallenges.security.SecurityUtils;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static sanets.dev.animechallenges.exception.ErrorMessages.ALREADY_PARTICIPATING_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.INVALID_ACCESS_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_NOT_AVAILABLE_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_PARTICIPATION_NOT_FOUND_MSG;
+import static sanets.dev.animechallenges.security.SecurityUtils.getCurrentUserUid;
+import static sanets.dev.animechallenges.security.SecurityUtils.getCurrentUsername;
+import static sanets.dev.animechallenges.security.SecurityUtils.isAdmin;
+import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccessByUsername;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class QuestParticipationService {
@@ -50,8 +58,10 @@ public class QuestParticipationService {
         return questParticipationMapper.toQuestParticipationResponseDto(participation);
     }
 
-    public List<QuestParticipation> getAllQuestParticipationByUserUid(UUID userUid) {
-       return questParticipationRepository.findAllByPerformerUid(userUid);
+    public List<QuestParticipationResponseDto> getAllQuestParticipationByUserUid(UUID userUid) {
+        return questParticipationRepository.findAllByPerformerUid(userUid).stream()
+                .map(questParticipationMapper::toQuestParticipationResponseDto)
+                .collect(toList());
     }
 
     public QuestParticipationResponseDto updateQuestParticipation(UpdateQuestParticipationRequestDto dto){
@@ -59,7 +69,7 @@ public class QuestParticipationService {
 
         User performer = questParticipationToUpdate.getPerformer();
 
-        SecurityUtils.validateUserAccessByUsername(performer.getUsername());
+        validateUserAccessByUsername(performer.getUsername());
 
         questParticipationMapper.updateQuestParticipationFromDto(dto, questParticipationToUpdate);
 
@@ -73,9 +83,10 @@ public class QuestParticipationService {
 
         User performer = participationToDelete.getPerformer();
 
-        SecurityUtils.validateUserAccessByUsername(performer.getUsername());
+        log.debug("Validate user access in delete Participation function ");
+        validateUserAccessByUsername(performer.getUsername());
 
-        if (performer.getRole().equals(UserRole.ROLE_ADMIN)){
+        if (isAdmin() && !(getCurrentUsername().equals(performer.getUsername())) ) {
             participationToDelete.setQuestStatus(QuestStatus.REJECTED);
         } else {
             participationToDelete.setQuestStatus(QuestStatus.CANCELLED);

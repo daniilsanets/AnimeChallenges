@@ -166,12 +166,12 @@ class QuestParticipationServiceTest {
     void getAllQuestParticipationByUserUid_success() {
         UUID userUid = user.getUid();
         when(questParticipationRepository.findAllByPerformerUid(userUid)).thenReturn(List.of(participation));
+        when(questParticipationMapper.toQuestParticipationResponseDto(any(QuestParticipation.class))).thenReturn(new QuestParticipationResponseDto());
 
-        List<QuestParticipation> result = questParticipationService.getAllQuestParticipationByUserUid(userUid);
+        List<QuestParticipationResponseDto> result = questParticipationService.getAllQuestParticipationByUserUid(userUid);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(participation, result.get(0));
     }
 
     @Test
@@ -241,7 +241,7 @@ class QuestParticipationServiceTest {
     }
 
     @Test
-    void deleteParticipationByUid_whenPerformerIsAdmin_setsRejected() {
+    void deleteParticipationByUid_whenIsAdmin_setsRejected() {
         UUID partUid = participation.getUid();
 
         participation.getPerformer().setRole(UserRole.ROLE_ADMIN);
@@ -252,8 +252,13 @@ class QuestParticipationServiceTest {
         securityUtilsMock.when(() -> SecurityUtils.validateUserAccessByUsername(any()))
                 .thenAnswer(invocation -> null);
 
-        questParticipationService.deleteParticipationByUid(partUid);
+        securityUtilsMock.when(SecurityUtils::isAdmin)
+                        .thenReturn(true);
 
+        securityUtilsMock.when(SecurityUtils::getCurrentUsername)
+                .thenReturn("someUsernameDifferentByPerformer");
+
+        questParticipationService.deleteParticipationByUid(partUid);
         assertEquals(QuestStatus.REJECTED, participation.getQuestStatus());
         verify(questParticipationRepository).save(participation);
     }
