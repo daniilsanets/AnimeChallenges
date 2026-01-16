@@ -87,7 +87,7 @@ public class BadgeServiceTest {
     }
 
     @Test
-    void deleteBadge_shouldRecallSaveAndSetIsActiveFalse_whenSuccess(){
+    void deleteBadge_shouldRecallSaveAndSetIsActiveFalse_whenc(){
         Badge badge = new Badge();
         badge.setActive(true);
 

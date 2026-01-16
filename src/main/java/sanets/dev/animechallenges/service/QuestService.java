@@ -85,7 +85,7 @@ public class QuestService {
         log.info("Quest deleted successfully with id: {}", savedQuest.getUid());
     }
 
-    private Quest getQuestByUid(UUID questUid) {
+    public Quest getQuestByUid(UUID questUid) {
         return questRepository.findByUid(questUid)
                 .orElseThrow( () -> new QuestNotFoundException(QUEST_NOT_FOUND_MSG));
     }

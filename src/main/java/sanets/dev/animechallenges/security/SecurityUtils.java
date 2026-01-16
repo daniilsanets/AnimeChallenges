@@ -43,4 +43,13 @@ public class SecurityUtils {
         }
         throw new InvalidAccessException(INVALID_ACCESS_MSG);
     }
+
+    public static String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        if (authentication != null) {
+            return userPrincipal.getUsername();
+        }
+        throw new InvalidAccessException(INVALID_ACCESS_MSG);
+    }
 }
