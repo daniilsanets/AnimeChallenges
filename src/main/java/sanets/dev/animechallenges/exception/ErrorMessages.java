@@ -25,4 +25,6 @@ public class ErrorMessages {
     public static final String ALREADY_PARTICIPATING_MSG = "You are already in :)";
 
     public static final String SUBMISSION_NOT_FOUND_MSG = "Submission not found in database by id";
+
+    public static final String SUBMISSION_NOT_AVAILABLE_MSG = "Submission not available, it has its state";
 }

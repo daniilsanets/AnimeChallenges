@@ -6,6 +6,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionResponseDto;
+import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
 import sanets.dev.animechallenges.model.QuestParticipation;
 import sanets.dev.animechallenges.model.Submission;
 
@@ -30,4 +31,10 @@ public interface SubmissionMapper {
 
     @Mapping(source = "submission.questParticipation.uid", target = "participationUid")
     CreateSubmissionResponseDto toCreateSubmissionResponseDto(Submission submission);
+
+    //TODO why do I need this?
+    @BeanMapping(ignoreUnmappedSourceProperties = {
+            "submissionType", "submittedAt", "rejectedAt", "approvedAt"
+    })
+    SubmissionResponseDto toSubmissionResponseDto(Submission submission);
 }
