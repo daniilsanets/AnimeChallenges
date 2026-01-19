@@ -2,6 +2,7 @@ package sanets.dev.animechallenges.dto.submission;
 
 import lombok.Getter;
 import lombok.Setter;
+import sanets.dev.animechallenges.model.SubmissionStatus;
 
 import java.util.UUID;
 
@@ -12,5 +13,5 @@ public class SubmissionResponseDto {
     private UUID participationUid;
     private String description;
     private String notes;
-    private String status;
+    private SubmissionStatus submissionStatus;
 }

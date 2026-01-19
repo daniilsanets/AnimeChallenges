@@ -1,62 +1,66 @@
 package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
-import sanets.dev.animechallenges.dto.submission.CreateSubmissionResponseDto;
 import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
-import sanets.dev.animechallenges.exception.submission.SubmissionHasItsStateException;
+import sanets.dev.animechallenges.exception.submission.SubmissionIsFinalizedException;
+import sanets.dev.animechallenges.exception.submission.SubmissionMediaLimitExceededException;
 import sanets.dev.animechallenges.exception.submission.SubmissionNotFoundException;
 import sanets.dev.animechallenges.mapper.SubmissionMapper;
 import sanets.dev.animechallenges.model.Media;
 import sanets.dev.animechallenges.model.QuestParticipation;
 import sanets.dev.animechallenges.model.Submission;
-import sanets.dev.animechallenges.model.SubmissionMedia;
-import sanets.dev.animechallenges.model.SubmissionType;
+import sanets.dev.animechallenges.model.SubmissionStatus;
 import sanets.dev.animechallenges.repository.SubmissionMediaRepository;
 import sanets.dev.animechallenges.repository.SubmissionRepository;
 
-import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
+import static java.time.OffsetDateTime.now;
+import static sanets.dev.animechallenges.exception.ErrorMessages.SUBMISSION_MEDIA_LIMIT_EXCEEDED_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.SUBMISSION_NOT_AVAILABLE_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.SUBMISSION_NOT_FOUND_MSG;
+import static sanets.dev.animechallenges.mapper.MediaMapper.mapMimeTypeToMediaType;
 
 @Service
 @RequiredArgsConstructor
 public class SubmissionService {
 
+    @Value("${media.max-uploaded-media}")
+    private int MAX_MEDIA_COULD_BE_ADDED;
+
     private final SubmissionRepository submissionRepository;
     private final SubmissionMediaRepository submissionMediaRepository;
     private final QuestParticipationService questParticipationService;
-    private final MediaService mediaService;
     private final SubmissionMapper submissionMapper;
 
-    public CreateSubmissionResponseDto createSubmission(CreateSubmissionRequestDto dto) {
+    public SubmissionResponseDto createSubmission(CreateSubmissionRequestDto dto) {
 
         QuestParticipation participation = questParticipationService.getQuestParticipationByUid(dto.getParticipationUid());
         Submission submission = submissionMapper.toSubmission(dto, participation);
-        submission.setSubmittedAt(OffsetDateTime.now());
+        submission.setSubmittedAt(now());
 
         submissionRepository.save(submission);
+        if (!(dto.getMedia().isEmpty())) {
+            addMediaToSubmission(dto.getMedia(), submission);
+        }
 
-        return submissionMapper.toCreateSubmissionResponseDto(submission);
+        return submissionMapper.toSubmissionResponseDto(submission);
     }
 
-    public Submission getSubmissionByUid(UUID submissionUid){
-        return submissionRepository.findByUid(submissionUid)
-                .orElseThrow(() -> new SubmissionNotFoundException(SUBMISSION_NOT_FOUND_MSG));
-    }
-
-    public SubmissionResponseDto cancelSubmissionByUid(UUID submissionUid){
+    public SubmissionResponseDto rejectSubmissionByUid(UUID submissionUid){
         Submission submission = getSubmissionByUid(submissionUid);
 
         checkApprovedOrRejected(submission);
 
-        submission.setRejectedAt(OffsetDateTime.now());
-        submissionRepository.save(submission);
-        //mapping and return SubmissionResponseDto
-        return new SubmissionResponseDto();
+        submission.setRejectedAt(now());
+        submission.setSubmissionStatus(SubmissionStatus.REJECTED);
+        submissionRepository.saveAndFlush(submission);
+
+        return submissionMapper.toSubmissionResponseDto(submission);
     }
 
     public SubmissionResponseDto approveSubmissionByUid(UUID submissionUid){
@@ -64,29 +68,41 @@ public class SubmissionService {
 
         checkApprovedOrRejected(submission);
 
-        submission.setApprovedAt(OffsetDateTime.now());
-        submissionRepository.save(submission);
-        //mapping and return SubmissionResponseDto
-        return new SubmissionResponseDto();
+        submission.setApprovedAt(now());
+        submission.setSubmissionStatus(SubmissionStatus.APPROVED);
+        submissionRepository.saveAndFlush(submission);
+
+        return submissionMapper.toSubmissionResponseDto(submission);
     }
 
-    /// will have write this method with many media (going to do auto type definition)
-    public void addMediaToSubmission(UUID submissionUid, UUID... mediaUid, SubmissionType... type){
-        Submission submission = getSubmissionByUid(submissionUid);
-        Media media = mediaService.getMediaByUid(mediaUid);
+    public Submission getSubmissionByUid(UUID submissionUid){
+        return submissionRepository.findByUid(submissionUid)
+                .orElseThrow(() -> new SubmissionNotFoundException(SUBMISSION_NOT_FOUND_MSG));
+    }
 
-        SubmissionMedia submissionMedia = SubmissionMedia.builder()
-                .submission(submission)
-                .media(media)
-                .build();
+    /// I think here should make a constraint for media quantity ex. 5 media
+    private void addMediaToSubmission(List<Media> mediaList, Submission submission){
+        long existingCount = submissionMediaRepository.countBySubmissionUid(submission.getUid());
 
-        submissionMediaRepository.save(submissionMedia);
-        
+        if (existingCount + mediaList.size() > MAX_MEDIA_COULD_BE_ADDED) {
+            throw new SubmissionMediaLimitExceededException(SUBMISSION_MEDIA_LIMIT_EXCEEDED_MSG.concat(String.valueOf(MAX_MEDIA_COULD_BE_ADDED)));
+        }
+
+        mediaList.forEach( media -> submissionMediaRepository.save(
+                submissionMapper.toSubmissionMedia(
+                        media,
+                        submission,
+                        mapMimeTypeToMediaType(media.getMimeType()))
+        ));
     }
 
     private void checkApprovedOrRejected(Submission submission) {
-        if (submission.getRejectedAt() == null || submission.getApprovedAt() == null) {
-            throw new SubmissionHasItsStateException(SUBMISSION_NOT_AVAILABLE_MSG);
+        if (isFinalized(submission)) {
+            throw new SubmissionIsFinalizedException(SUBMISSION_NOT_AVAILABLE_MSG);
         }
+    }
+
+    private boolean isFinalized(Submission submission){
+        return !SubmissionStatus.PENDING.equals(submission.getSubmissionStatus());
     }
 }

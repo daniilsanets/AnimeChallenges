@@ -2,6 +2,8 @@ package sanets.dev.animechallenges.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
@@ -35,6 +37,10 @@ public class SubmissionMedia {
     @NotNull
     private Submission submission;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "media_type", nullable = false)
+    private MediaType mediaType;
+
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "media_uid", referencedColumnName = "uid", nullable = false)
@@ -44,5 +50,5 @@ public class SubmissionMedia {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     @Setter(AccessLevel.NONE)
-    private OffsetDateTime created_at;
+    private OffsetDateTime createdAt;
 }

@@ -8,7 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
@@ -40,16 +40,17 @@ public class Submission {
     @NotNull
     private UUID uid;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participation_uid", referencedColumnName = "uid", nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     @NotNull
     private QuestParticipation questParticipation;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "submission_type", nullable = false, columnDefinition = "submission_type")
+    @Column(name = "submission_status",  nullable = false)
+    @Builder.Default
     @NotNull
-    private SubmissionType submissionType;
+    private SubmissionStatus submissionStatus = SubmissionStatus.PENDING;
 
     @Column(name = "description", nullable = false, columnDefinition = "TEXT", length = 5000)
     @NotNull

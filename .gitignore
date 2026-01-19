@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Files ###
+application.yml
+liquibase.properties
+docker-compose.yml

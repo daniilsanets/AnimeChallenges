@@ -5,10 +5,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
-import sanets.dev.animechallenges.dto.submission.CreateSubmissionResponseDto;
 import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
+import sanets.dev.animechallenges.model.Media;
+import sanets.dev.animechallenges.model.MediaType;
 import sanets.dev.animechallenges.model.QuestParticipation;
 import sanets.dev.animechallenges.model.Submission;
+import sanets.dev.animechallenges.model.SubmissionMedia;
 
 @Mapper(componentModel = "spring",
         unmappedSourcePolicy = ReportingPolicy.ERROR,
@@ -16,7 +18,7 @@ import sanets.dev.animechallenges.model.Submission;
 public interface SubmissionMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
-        "participationUid"
+        "participationUid", "media",  "uid" , "performer", "quest", "questStatus", "startedAt", "score"
     })
     @Mapping(source = "participation", target = "questParticipation")
     @Mapping(target = "uid", ignore = true)
@@ -25,16 +27,12 @@ public interface SubmissionMapper {
     @Mapping(target = "approvedAt", ignore = true)
     Submission toSubmission(CreateSubmissionRequestDto dto, QuestParticipation participation);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {
-            "submissionType", "submittedAt", "rejectedAt", "approvedAt"
-    })
+    @Mapping(target = "createdAt", ignore = true)
+    SubmissionMedia toSubmissionMedia(Media media, Submission submission, MediaType mediaType);
 
+    @BeanMapping(ignoreUnmappedSourceProperties = {
+            "submittedAt", "rejectedAt", "approvedAt", "createdAt", "updatedAt"
+    })
     @Mapping(source = "submission.questParticipation.uid", target = "participationUid")
-    CreateSubmissionResponseDto toCreateSubmissionResponseDto(Submission submission);
-
-    //TODO why do I need this?
-    @BeanMapping(ignoreUnmappedSourceProperties = {
-            "submissionType", "submittedAt", "rejectedAt", "approvedAt"
-    })
     SubmissionResponseDto toSubmissionResponseDto(Submission submission);
 }

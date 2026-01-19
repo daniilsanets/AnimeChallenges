@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import sanets.dev.animechallenges.model.SubmissionType;
+import sanets.dev.animechallenges.model.Media;
+import sanets.dev.animechallenges.model.SubmissionStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,7 +17,9 @@ public class CreateSubmissionRequestDto {
     private UUID participationUid;
 
     @NotNull
-    private SubmissionType submissionType;
+    private SubmissionStatus submissionStatus;
+
+    private List<Media> media;
 
     @NotNull
     @Length(max = 5000)

@@ -1,7 +1,7 @@
 package sanets.dev.animechallenges.exception.submission;
 
-public class SubmissionIsFinalized extends RuntimeException {
-    public SubmissionIsFinalized(String message) {
+public class SubmissionIsFinalizedException extends RuntimeException {
+    public SubmissionIsFinalizedException(String message) {
         super(message);
     }
 }
