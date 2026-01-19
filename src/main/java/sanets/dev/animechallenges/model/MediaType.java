@@ -1,8 +1,7 @@
 package sanets.dev.animechallenges.model;
 
-public enum SubmissionType {
+public enum MediaType {
     PHOTO,
-    TEXT,
     LINK,
     VIDEO
 }
