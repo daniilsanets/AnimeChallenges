@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import sanets.dev.animechallenges.model.QuestsDifficulty;
+import sanets.dev.animechallenges.model.quest.QuestsDifficulty;
 
 @Getter
 @Setter

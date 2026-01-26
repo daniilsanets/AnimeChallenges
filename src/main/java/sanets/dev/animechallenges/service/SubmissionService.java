@@ -9,10 +9,10 @@ import sanets.dev.animechallenges.exception.submission.SubmissionIsFinalizedExce
 import sanets.dev.animechallenges.exception.submission.SubmissionMediaLimitExceededException;
 import sanets.dev.animechallenges.exception.submission.SubmissionNotFoundException;
 import sanets.dev.animechallenges.mapper.SubmissionMapper;
-import sanets.dev.animechallenges.model.Media;
-import sanets.dev.animechallenges.model.QuestParticipation;
-import sanets.dev.animechallenges.model.Submission;
-import sanets.dev.animechallenges.model.SubmissionStatus;
+import sanets.dev.animechallenges.model.media.Media;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
+import sanets.dev.animechallenges.model.submission.Submission;
+import sanets.dev.animechallenges.model.submission.SubmissionStatus;
 import sanets.dev.animechallenges.repository.SubmissionMediaRepository;
 import sanets.dev.animechallenges.repository.SubmissionRepository;
 
@@ -44,7 +44,7 @@ public class SubmissionService {
         submission.setSubmittedAt(now());
 
         submissionRepository.save(submission);
-        if (!(dto.getMedia().isEmpty())) {
+        if (!dto.getMedia().isEmpty()) {
             addMediaToSubmission(dto.getMedia(), submission);
         }
 
@@ -80,7 +80,6 @@ public class SubmissionService {
                 .orElseThrow(() -> new SubmissionNotFoundException(SUBMISSION_NOT_FOUND_MSG));
     }
 
-    /// I think here should make a constraint for media quantity ex. 5 media
     private void addMediaToSubmission(List<Media> mediaList, Submission submission){
         long existingCount = submissionMediaRepository.countBySubmissionUid(submission.getUid());
 
@@ -97,12 +96,9 @@ public class SubmissionService {
     }
 
     private void checkApprovedOrRejected(Submission submission) {
-        if (isFinalized(submission)) {
+        if (!SubmissionStatus.PENDING.equals(submission.getSubmissionStatus())) {
             throw new SubmissionIsFinalizedException(SUBMISSION_NOT_AVAILABLE_MSG);
         }
     }
 
-    private boolean isFinalized(Submission submission){
-        return !SubmissionStatus.PENDING.equals(submission.getSubmissionStatus());
-    }
 }

@@ -8,8 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
-import sanets.dev.animechallenges.model.User;
-import sanets.dev.animechallenges.model.UserRole;
+import sanets.dev.animechallenges.model.user.User;
+import sanets.dev.animechallenges.model.user.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
 
 import java.util.Optional;

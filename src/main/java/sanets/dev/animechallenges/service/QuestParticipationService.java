@@ -11,10 +11,10 @@ import sanets.dev.animechallenges.exception.participation.AlreadyParticipatingEx
 import sanets.dev.animechallenges.exception.participation.ParticipationNotFoundException;
 import sanets.dev.animechallenges.exception.quest.QuestNotAvailable;
 import sanets.dev.animechallenges.mapper.QuestParticipationMapper;
-import sanets.dev.animechallenges.model.Quest;
-import sanets.dev.animechallenges.model.QuestParticipation;
-import sanets.dev.animechallenges.model.QuestStatus;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
+import sanets.dev.animechallenges.model.quest.QuestStatus;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.QuestParticipationRepository;
 import sanets.dev.animechallenges.security.SecurityUtils;
 

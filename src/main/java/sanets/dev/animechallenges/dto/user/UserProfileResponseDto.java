@@ -2,7 +2,7 @@ package sanets.dev.animechallenges.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;
-import sanets.dev.animechallenges.model.UserRole;
+import sanets.dev.animechallenges.model.user.UserRole;
 
 import java.util.UUID;
 

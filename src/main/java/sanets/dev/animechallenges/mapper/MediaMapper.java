@@ -5,8 +5,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.web.multipart.MultipartFile;
-import sanets.dev.animechallenges.model.Media;
-import sanets.dev.animechallenges.model.MediaType;
+import sanets.dev.animechallenges.model.media.Media;
+import sanets.dev.animechallenges.model.media.MediaType;
 
 import static sanets.dev.animechallenges.exception.ErrorMessages.INVALID_MEDIA_CASTING_MSG;
 

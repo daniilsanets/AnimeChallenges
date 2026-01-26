@@ -4,8 +4,8 @@ import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import sanets.dev.animechallenges.model.User;
-import sanets.dev.animechallenges.model.UserRole;
+import sanets.dev.animechallenges.model.user.User;
+import sanets.dev.animechallenges.model.user.UserRole;
 
 import java.util.UUID;
 

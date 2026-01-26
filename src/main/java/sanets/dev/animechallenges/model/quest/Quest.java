@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.quest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,61 +21,69 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.validator.constraints.Length;
+import sanets.dev.animechallenges.model.badge.Badge;
+import sanets.dev.animechallenges.model.user.User;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Setter
+@Getter
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "quest")
+public class Quest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "uid", updatable = false, nullable = false)
+    @Column(name = "uid",  updatable = false, nullable = false)
     @Setter(AccessLevel.NONE)
     @NotNull
     private UUID uid;
 
-    @Email
-    @Column(name = "email", unique = true, nullable = false, length = 320)
+    @Column(name = "title", nullable = false, length = 255)
     @NotNull
-    @Length(max = 320)
-    private String email;
+    @Length(max = 255)
+    private String title;
 
-    @Column(name = "username", unique = true, nullable = false, length = 100)
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     @NotNull
-    @Length(max = 100)
-    private String username;
+    @Length(max = 5000)
+    private String description;
 
-    @Column(name = "password_hash", nullable = false, length = 200)
-    @NotNull
-    @Length(max = 200)
-    private String passwordHash;
-
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 50)
+    @Column(name = "difficulty", nullable = false, columnDefinition = "quests_difficulty")
     @NotNull
-    private UserRole role;
+    private QuestsDifficulty difficulty;
 
-    @Column(name = "nickname", length = 200)
-    @Length(max = 200)
-    private String nickname;
+    @Min(0)
+    @Max(10)
+    @Column(name = "reward_points", nullable = false)
+    @NotNull
+    private Integer rewardPoints;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "avatar_media_uid", referencedColumnName = "uid")
-    private Media avatar;
+    @JoinColumn(name = "badge_uid", referencedColumnName = "uid", nullable = false)
+    @NotNull
+    private Badge badge;
 
-    @Column(name = "bio", columnDefinition = "TEXT", length = 1000)
-    @Length(max = 1000)
-    private String bio;
+    @Min(1)
+    @Max(5)
+    @Column(name = "max_attempts", nullable = false)
+    @NotNull
+    private Integer maxAttempts;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_uid", referencedColumnName = "uid", nullable = false)
+    @NotNull
+    private User creator;
 
     @Column(name = "is_active")
     private Boolean isActive = true;

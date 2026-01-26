@@ -2,7 +2,7 @@ package sanets.dev.animechallenges.dto.participation;
 
 import lombok.Getter;
 import lombok.Setter;
-import sanets.dev.animechallenges.model.QuestStatus;
+import sanets.dev.animechallenges.model.quest.QuestStatus;
 
 import java.util.UUID;
 

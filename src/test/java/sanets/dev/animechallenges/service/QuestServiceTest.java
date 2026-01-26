@@ -12,10 +12,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
 import sanets.dev.animechallenges.mapper.QuestMapper;
-import sanets.dev.animechallenges.model.Badge;
-import sanets.dev.animechallenges.model.Quest;
-import sanets.dev.animechallenges.model.QuestsDifficulty;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.badge.Badge;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.quest.QuestsDifficulty;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.QuestRepository;
 import sanets.dev.animechallenges.security.SecurityUtils;
 

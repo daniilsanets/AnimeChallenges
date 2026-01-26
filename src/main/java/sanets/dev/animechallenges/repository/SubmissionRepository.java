@@ -1,7 +1,7 @@
 package sanets.dev.animechallenges.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sanets.dev.animechallenges.model.Submission;
+import sanets.dev.animechallenges.model.submission.Submission;
 
 import java.util.Optional;
 import java.util.UUID;

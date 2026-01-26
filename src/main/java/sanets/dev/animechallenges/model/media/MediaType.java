@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.media;
 
 public enum MediaType {
     PHOTO,

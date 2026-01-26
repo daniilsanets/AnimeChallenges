@@ -25,7 +25,7 @@ public class ErrorMessages {
     public static final String ALREADY_PARTICIPATING_MSG = "You are already in :)";
 
     public static final String SUBMISSION_NOT_FOUND_MSG = "Submission not found in database by id";
-    public static final String SUBMISSION_NOT_AVAILABLE_MSG = "Submission not available, it has its state";
+    public static final String SUBMISSION_NOT_AVAILABLE_MSG = "Submission not available";
     public static final String SUBMISSION_MEDIA_LIMIT_EXCEEDED_MSG = "Maximum media limit exceeded. Allowed: ";
 
     public static final String INVALID_MEDIA_CASTING_MSG = "Invalid media type casting";

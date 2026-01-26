@@ -6,11 +6,11 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
 import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
-import sanets.dev.animechallenges.model.Media;
-import sanets.dev.animechallenges.model.MediaType;
-import sanets.dev.animechallenges.model.QuestParticipation;
-import sanets.dev.animechallenges.model.Submission;
-import sanets.dev.animechallenges.model.SubmissionMedia;
+import sanets.dev.animechallenges.model.media.Media;
+import sanets.dev.animechallenges.model.media.MediaType;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
+import sanets.dev.animechallenges.model.submission.Submission;
+import sanets.dev.animechallenges.model.submission.SubmissionMedia;
 
 @Mapper(componentModel = "spring",
         unmappedSourcePolicy = ReportingPolicy.ERROR,

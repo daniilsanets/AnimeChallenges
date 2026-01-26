@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import sanets.dev.animechallenges.model.Badge;
-import sanets.dev.animechallenges.model.BadgeType;
+import sanets.dev.animechallenges.model.badge.Badge;
+import sanets.dev.animechallenges.model.badge.BadgeType;
 
 import java.util.List;
 import java.util.Optional;

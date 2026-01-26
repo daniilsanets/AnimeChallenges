@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import sanets.dev.animechallenges.model.QuestStatus;
+import sanets.dev.animechallenges.model.quest.QuestStatus;
 
 import java.util.UUID;
 

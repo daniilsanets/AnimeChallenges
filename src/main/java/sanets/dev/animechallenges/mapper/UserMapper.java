@@ -1,7 +1,6 @@
 package sanets.dev.animechallenges.mapper;
 
 import org.mapstruct.BeanMapping;
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -10,11 +9,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
-import sanets.dev.animechallenges.model.Media;
-import sanets.dev.animechallenges.model.User;
-import sanets.dev.animechallenges.service.MediaService;
-
-import java.util.UUID;
+import sanets.dev.animechallenges.model.user.User;
 
 @Mapper(componentModel = "spring",
         unmappedSourcePolicy = ReportingPolicy.ERROR,

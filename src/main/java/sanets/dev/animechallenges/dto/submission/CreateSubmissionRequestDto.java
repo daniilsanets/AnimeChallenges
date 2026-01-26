@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import sanets.dev.animechallenges.model.Media;
-import sanets.dev.animechallenges.model.SubmissionStatus;
+import sanets.dev.animechallenges.model.media.Media;
+import sanets.dev.animechallenges.model.submission.SubmissionStatus;
 
 import java.util.List;
 import java.util.UUID;

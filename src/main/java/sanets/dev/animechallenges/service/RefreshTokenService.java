@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import sanets.dev.animechallenges.exception.auth.TokenRefreshException;
-import sanets.dev.animechallenges.model.RefreshToken;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.security.RefreshToken;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.RefreshTokenRepository;
 
 import java.time.OffsetDateTime;

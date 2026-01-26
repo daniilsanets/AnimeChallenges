@@ -2,7 +2,7 @@ package sanets.dev.animechallenges.dto.submission;
 
 import lombok.Getter;
 import lombok.Setter;
-import sanets.dev.animechallenges.model.SubmissionStatus;
+import sanets.dev.animechallenges.model.submission.SubmissionStatus;
 
 import java.util.UUID;
 

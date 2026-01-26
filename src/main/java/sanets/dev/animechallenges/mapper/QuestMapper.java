@@ -10,7 +10,7 @@ import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.quest.QuestResponseDto;
 import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
 import sanets.dev.animechallenges.dto.quest.UpdateQuestRequestDto;
-import sanets.dev.animechallenges.model.Quest;
+import sanets.dev.animechallenges.model.quest.Quest;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.ERROR,

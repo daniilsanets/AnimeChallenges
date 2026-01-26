@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.submission;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +18,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import sanets.dev.animechallenges.model.media.Media;
+import sanets.dev.animechallenges.model.media.MediaType;
 
 import java.time.OffsetDateTime;
 
@@ -37,8 +41,9 @@ public class SubmissionMedia {
     @NotNull
     private Submission submission;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
-    @Column(name = "media_type", nullable = false)
+    @Column(name = "media_type", columnDefinition = "media_type", nullable = false)
     private MediaType mediaType;
 
     @Id

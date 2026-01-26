@@ -12,11 +12,11 @@ import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
 import sanets.dev.animechallenges.exception.submission.SubmissionIsFinalizedException;
 import sanets.dev.animechallenges.exception.submission.SubmissionMediaLimitExceededException;
 import sanets.dev.animechallenges.mapper.SubmissionMapper;
-import sanets.dev.animechallenges.model.Media;
-import sanets.dev.animechallenges.model.QuestParticipation;
-import sanets.dev.animechallenges.model.Submission;
-import sanets.dev.animechallenges.model.SubmissionStatus;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.media.Media;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
+import sanets.dev.animechallenges.model.submission.Submission;
+import sanets.dev.animechallenges.model.submission.SubmissionStatus;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.SubmissionMediaRepository;
 import sanets.dev.animechallenges.repository.SubmissionRepository;
 

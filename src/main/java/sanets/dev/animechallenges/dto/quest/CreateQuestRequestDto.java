@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import sanets.dev.animechallenges.model.QuestsDifficulty;
+import sanets.dev.animechallenges.model.quest.QuestsDifficulty;
 
 import java.util.UUID;
 

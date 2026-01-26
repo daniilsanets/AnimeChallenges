@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.badge;
 
 
 import jakarta.persistence.Column;
@@ -24,7 +24,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import sanets.dev.animechallenges.model.media.Media;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -51,6 +51,7 @@ public class Badge {
     @Length(max = 100)
     private String code;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "badge_type", columnDefinition = "badge_types", nullable = false)

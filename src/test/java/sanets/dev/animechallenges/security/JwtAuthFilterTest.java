@@ -15,7 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import sanets.dev.animechallenges.model.UserRole;
+import sanets.dev.animechallenges.model.user.UserRole;
 import sanets.dev.animechallenges.service.MyUserDetailsService;
 
 import java.util.List;

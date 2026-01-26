@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.submission;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +19,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.validator.constraints.Length;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -47,6 +50,7 @@ public class Submission {
     private QuestParticipation questParticipation;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "submission_status",  nullable = false)
     @Builder.Default
     @NotNull

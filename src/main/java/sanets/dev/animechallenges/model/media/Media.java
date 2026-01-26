@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.media;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
