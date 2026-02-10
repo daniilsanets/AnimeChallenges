@@ -27,7 +27,8 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/*/auth/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
                     .requestMatchers("/api/admin/**").hasRole("ADMIN") /// I think I'll remove this 'cause I will hang the @PreAuthorize
                     .anyRequest().authenticated()
                 );

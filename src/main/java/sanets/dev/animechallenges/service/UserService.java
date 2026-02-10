@@ -24,7 +24,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final MediaService mediaService;
-
+//TODO: Here is a problem, I have unnecessary attribute userToUpdateUid
+// because user can update only its profile
     public UserProfileResponseDto updateUserProfileByUId(UUID userToUpdateUid, UpdateUserProfileRequestDto userProfileRequestDto){
         User userToUpdate = getUserByUid(userToUpdateUid);
 

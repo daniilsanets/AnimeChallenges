@@ -26,18 +26,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            try {
-                Claims claims = jwtTokenProvider.validateTokenAndGetClaim(token);
+        String token = authHeader.substring(7).trim();
 
-                String username = claims.getSubject();
+        if(token.isEmpty()){
+            filterChain.doFilter(request, response);
+            return;
+        }
 
+        try {
+            Claims claims = jwtTokenProvider.validateTokenAndGetClaim(token);
+
+            String username = claims.getSubject();
+
+            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken authentication =
@@ -50,9 +59,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (Exception e) {
-                log.error("JWT Authentication failed: {}", e.getMessage());
             }
+        } catch (Exception e) {
+            log.error("JWT Authentication invalid or expired: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
