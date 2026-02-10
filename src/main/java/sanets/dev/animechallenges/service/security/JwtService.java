@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.service;
+package sanets.dev.animechallenges.service.security;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;

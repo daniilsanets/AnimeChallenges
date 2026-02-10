@@ -19,6 +19,9 @@ import sanets.dev.animechallenges.model.security.RefreshToken;
 import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.model.user.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
+import sanets.dev.animechallenges.service.security.AuthService;
+import sanets.dev.animechallenges.service.security.JwtService;
+import sanets.dev.animechallenges.service.security.RefreshTokenService;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;

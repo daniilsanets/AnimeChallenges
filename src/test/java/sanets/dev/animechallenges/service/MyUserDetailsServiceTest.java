@@ -11,6 +11,7 @@ import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.model.user.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
+import sanets.dev.animechallenges.service.security.MyUserDetailsService;
 
 import java.util.Optional;
 

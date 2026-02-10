@@ -3,6 +3,7 @@ package sanets.dev.animechallenges.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
 import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
 import sanets.dev.animechallenges.exception.submission.SubmissionIsFinalizedException;
@@ -37,20 +38,21 @@ public class SubmissionService {
     private final QuestParticipationService questParticipationService;
     private final SubmissionMapper submissionMapper;
 
+    @Transactional
     public SubmissionResponseDto createSubmission(CreateSubmissionRequestDto dto) {
 
         QuestParticipation participation = questParticipationService.getQuestParticipationByUid(dto.getParticipationUid());
         Submission submission = submissionMapper.toSubmission(dto, participation);
         submission.setSubmittedAt(now());
 
-        submissionRepository.save(submission);
         if (!dto.getMedia().isEmpty()) {
             addMediaToSubmission(dto.getMedia(), submission);
         }
 
-        return submissionMapper.toSubmissionResponseDto(submission);
+        return submissionMapper.toSubmissionResponseDto(submissionRepository.save(submission));
     }
 
+    @Transactional
     public SubmissionResponseDto rejectSubmissionByUid(UUID submissionUid){
         Submission submission = getSubmissionByUid(submissionUid);
 
@@ -63,6 +65,7 @@ public class SubmissionService {
         return submissionMapper.toSubmissionResponseDto(submission);
     }
 
+    @Transactional
     public SubmissionResponseDto approveSubmissionByUid(UUID submissionUid){
         Submission submission = getSubmissionByUid(submissionUid);
 

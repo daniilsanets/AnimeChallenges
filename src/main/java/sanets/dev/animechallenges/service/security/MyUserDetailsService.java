@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.service;
+package sanets.dev.animechallenges.service.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

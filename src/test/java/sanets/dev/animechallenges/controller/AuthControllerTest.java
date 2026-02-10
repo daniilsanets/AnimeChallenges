@@ -11,8 +11,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import sanets.dev.animechallenges.dto.auth.LoginRequestDto;
 import sanets.dev.animechallenges.dto.auth.LoginResponseDto;
 import sanets.dev.animechallenges.dto.auth.SignUpRequestDto;
-import sanets.dev.animechallenges.service.AuthService;
-import sanets.dev.animechallenges.service.JwtService;
+import sanets.dev.animechallenges.service.security.AuthService;
+import sanets.dev.animechallenges.service.security.JwtService;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.Matchers.is;
 
