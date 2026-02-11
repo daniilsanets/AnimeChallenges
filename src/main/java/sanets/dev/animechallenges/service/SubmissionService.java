@@ -1,6 +1,7 @@
 package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import static sanets.dev.animechallenges.mapper.MediaMapper.mapMimeTypeToMediaTy
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SubmissionService {
 
     @Value("${media.max-uploaded-media}")
@@ -46,13 +48,14 @@ public class SubmissionService {
         submission.setSubmittedAt(now());
 
         if (!dto.getMedia().isEmpty()) {
+            log.debug("user attached media files to submission {}", submission);
             addMediaToSubmission(dto.getMedia(), submission);
         }
 
+        log.info("submission created {}", submission);
         return submissionMapper.toSubmissionResponseDto(submissionRepository.save(submission));
     }
 
-    @Transactional
     public SubmissionResponseDto rejectSubmissionByUid(UUID submissionUid){
         Submission submission = getSubmissionByUid(submissionUid);
 
@@ -60,12 +63,12 @@ public class SubmissionService {
 
         submission.setRejectedAt(now());
         submission.setSubmissionStatus(SubmissionStatus.REJECTED);
-        submissionRepository.saveAndFlush(submission);
 
+        submissionRepository.saveAndFlush(submission);
+        log.info("submission was rejected {}",  submission.getUid());
         return submissionMapper.toSubmissionResponseDto(submission);
     }
 
-    @Transactional
     public SubmissionResponseDto approveSubmissionByUid(UUID submissionUid){
         Submission submission = getSubmissionByUid(submissionUid);
 
@@ -73,8 +76,9 @@ public class SubmissionService {
 
         submission.setApprovedAt(now());
         submission.setSubmissionStatus(SubmissionStatus.APPROVED);
-        submissionRepository.saveAndFlush(submission);
 
+        submissionRepository.saveAndFlush(submission);
+        log.info("submission was approved {}",  submission.getUid());
         return submissionMapper.toSubmissionResponseDto(submission);
     }
 
@@ -87,6 +91,7 @@ public class SubmissionService {
         long existingCount = submissionMediaRepository.countBySubmissionUid(submission.getUid());
 
         if (existingCount + mediaList.size() > MAX_MEDIA_COULD_BE_ADDED) {
+            log.error("submission has not been added to media collection, limit {} media", MAX_MEDIA_COULD_BE_ADDED);
             throw new SubmissionMediaLimitExceededException(SUBMISSION_MEDIA_LIMIT_EXCEEDED_MSG.concat(String.valueOf(MAX_MEDIA_COULD_BE_ADDED)));
         }
 
@@ -96,10 +101,13 @@ public class SubmissionService {
                         submission,
                         mapMimeTypeToMediaType(media.getMimeType()))
         ));
+        log.info("Media {} was successfully added to submission {}", mediaList.toString(), submission.getUid());
     }
 
     private void checkApprovedOrRejected(Submission submission) {
+        log.debug("checkApprovedOrRejected submission {}", submission.getUid());
         if (!SubmissionStatus.PENDING.equals(submission.getSubmissionStatus())) {
+            log.error("submission was finalized {}", submission.getUid());
             throw new SubmissionIsFinalizedException(SUBMISSION_NOT_AVAILABLE_MSG);
         }
     }
