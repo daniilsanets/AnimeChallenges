@@ -1,8 +1,8 @@
 package sanets.dev.animechallenges.repository.specification;
 
 import org.springframework.data.jpa.domain.Specification;
-import sanets.dev.animechallenges.model.Quest;
-import sanets.dev.animechallenges.model.QuestsDifficulty;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.quest.QuestsDifficulty;
 
 public class QuestSpecification {
     private QuestSpecification(){}

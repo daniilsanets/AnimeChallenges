@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.quest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,9 +8,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.constraints.Length;
+import org.hibernate.type.SqlTypes;
+import sanets.dev.animechallenges.model.user.User;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -28,47 +31,44 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
 @Getter
+@Setter
 @Entity
-@Table(name = "submission")
-public class Submission {
+@Table(name = "quest_participation")
+public class QuestParticipation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "uid", nullable = false, updatable = false)
+    @Column(name = "uid", updatable = false, nullable = false)
     @Setter(AccessLevel.NONE)
     @NotNull
     private UUID uid;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participation_uid", referencedColumnName = "uid", nullable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_uid", referencedColumnName = "uid", nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     @NotNull
-    private QuestParticipation questParticipation;
+    private User performer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quest_uid", referencedColumnName = "uid", nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
+    @NotNull
+    private Quest quest;
+
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
-    @Column(name = "submission_type", nullable = false, columnDefinition = "submission_status")
+    @Column(name = "quest_status", columnDefinition = "quests_status", nullable = false)
     @NotNull
-    private SubmissionStatus submissionStatus;
+    private QuestStatus questStatus;
 
-    @Column(name = "description", nullable = false, columnDefinition = "TEXT", length = 5000)
+    @Column(name = "started_at")
+    private OffsetDateTime startedAt;
+
+    @Min(0)
+    @Column(name = "score", nullable = false)
     @NotNull
-    @Length(max = 5000)
-    private String description;
-
-    @Column(name = "notes", nullable = false, columnDefinition = "TEXT", length = 1000)
-    @NotNull
-    @Length(max = 1000)
-    private String notes;
-
-    @Column(name = "submitted_at")
-    private OffsetDateTime submittedAt;
-
-    @Column(name = "rejected_at")
-    private OffsetDateTime rejectedAt;
-
-    @Column(name = "approved_at")
-    private OffsetDateTime approvedAt;
+    private Integer score;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

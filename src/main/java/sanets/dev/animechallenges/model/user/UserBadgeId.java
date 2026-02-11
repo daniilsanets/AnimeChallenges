@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.user;
 
 import java.io.Serializable;
 import java.util.UUID;

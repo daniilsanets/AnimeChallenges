@@ -11,24 +11,20 @@ import sanets.dev.animechallenges.exception.participation.AlreadyParticipatingEx
 import sanets.dev.animechallenges.exception.participation.ParticipationNotFoundException;
 import sanets.dev.animechallenges.exception.quest.QuestNotAvailable;
 import sanets.dev.animechallenges.mapper.QuestParticipationMapper;
-import sanets.dev.animechallenges.model.Quest;
-import sanets.dev.animechallenges.model.QuestParticipation;
-import sanets.dev.animechallenges.model.QuestStatus;
-import sanets.dev.animechallenges.model.User;
-import sanets.dev.animechallenges.model.UserRole;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
+import sanets.dev.animechallenges.model.quest.QuestStatus;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.QuestParticipationRepository;
 import sanets.dev.animechallenges.security.SecurityUtils;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.toList;
 import static sanets.dev.animechallenges.exception.ErrorMessages.ALREADY_PARTICIPATING_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.INVALID_ACCESS_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_NOT_AVAILABLE_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_PARTICIPATION_NOT_FOUND_MSG;
-import static sanets.dev.animechallenges.security.SecurityUtils.getCurrentUserUid;
 import static sanets.dev.animechallenges.security.SecurityUtils.getCurrentUsername;
 import static sanets.dev.animechallenges.security.SecurityUtils.isAdmin;
 import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccessByUsername;
@@ -95,7 +91,7 @@ public class QuestParticipationService {
         questParticipationRepository.save(participationToDelete);
     }
 
-    private QuestParticipation getQuestParticipationByUid(UUID questParticipation) {
+    public QuestParticipation getQuestParticipationByUid(UUID questParticipation) {
         return questParticipationRepository.findQuestParticipationByUid(questParticipation)
                 .orElseThrow(() -> new ParticipationNotFoundException(QUEST_PARTICIPATION_NOT_FOUND_MSG));
     }

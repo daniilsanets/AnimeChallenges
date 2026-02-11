@@ -1,9 +1,9 @@
-package sanets.dev.animechallenges.service;
+package sanets.dev.animechallenges.service.security;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.security.JwtTokenProvider;
 
 @Slf4j

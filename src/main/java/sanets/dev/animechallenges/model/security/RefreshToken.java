@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.model;
+package sanets.dev.animechallenges.model.security;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+import sanets.dev.animechallenges.model.user.User;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package sanets.dev.animechallenges.service;
+package sanets.dev.animechallenges.service.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +13,9 @@ import sanets.dev.animechallenges.exception.auth.UserAlreadyExistsException;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.exception.auth.WrongPasswordException;
 import sanets.dev.animechallenges.mapper.AuthMapper;
-import sanets.dev.animechallenges.model.RefreshToken;
-import sanets.dev.animechallenges.model.User;
-import sanets.dev.animechallenges.model.UserRole;
+import sanets.dev.animechallenges.model.security.RefreshToken;
+import sanets.dev.animechallenges.model.user.User;
+import sanets.dev.animechallenges.model.user.UserRole;
 import sanets.dev.animechallenges.repository.UserRepository;
 
 import java.time.OffsetDateTime;

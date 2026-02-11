@@ -7,10 +7,9 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.participation.UpdateQuestParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.QuestParticipationResponseDto;
-import sanets.dev.animechallenges.model.Quest;
-import sanets.dev.animechallenges.model.QuestParticipation;
-import sanets.dev.animechallenges.model.QuestStatus;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
+import sanets.dev.animechallenges.model.user.User;
 
 @Mapper(componentModel = "spring",
     unmappedSourcePolicy = ReportingPolicy.ERROR,

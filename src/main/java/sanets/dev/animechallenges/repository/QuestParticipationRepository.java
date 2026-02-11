@@ -4,10 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import sanets.dev.animechallenges.model.Quest;
-import sanets.dev.animechallenges.model.QuestParticipation;
-import sanets.dev.animechallenges.model.QuestStatus;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
+import sanets.dev.animechallenges.model.quest.QuestStatus;
+import sanets.dev.animechallenges.model.user.User;
 
 import java.util.List;
 import java.util.Optional;

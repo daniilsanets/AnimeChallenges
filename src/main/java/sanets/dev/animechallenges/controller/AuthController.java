@@ -12,7 +12,7 @@ import sanets.dev.animechallenges.dto.auth.LoginResponseDto;
 import sanets.dev.animechallenges.dto.auth.RefreshRequestDto;
 import sanets.dev.animechallenges.dto.auth.SignUpRequestDto;
 import sanets.dev.animechallenges.dto.auth.SignUpResponseDto;
-import sanets.dev.animechallenges.service.AuthService;
+import sanets.dev.animechallenges.service.security.AuthService;
 
 @Slf4j
 @RestController

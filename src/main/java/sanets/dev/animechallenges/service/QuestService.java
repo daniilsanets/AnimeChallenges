@@ -12,9 +12,9 @@ import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
 import sanets.dev.animechallenges.dto.quest.UpdateQuestRequestDto;
 import sanets.dev.animechallenges.exception.quest.QuestNotFoundException;
 import sanets.dev.animechallenges.mapper.QuestMapper;
-import sanets.dev.animechallenges.model.Badge;
-import sanets.dev.animechallenges.model.Quest;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.badge.Badge;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.QuestRepository;
 
 import java.util.UUID;

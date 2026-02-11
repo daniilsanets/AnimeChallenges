@@ -1,5 +1,4 @@
-package sanets.dev.animechallenges.model;
-
+package sanets.dev.animechallenges.model.submission;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,10 +7,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,21 +23,19 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import sanets.dev.animechallenges.model.quest.QuestParticipation;
 
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
 @Setter
+@Getter
 @Entity
-@Table(name="badge")
-public class Badge {
-
+@Table(name = "submission")
+public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "uid", nullable = false, updatable = false)
@@ -46,46 +43,46 @@ public class Badge {
     @NotNull
     private UUID uid;
 
-    @Column(name = "code", nullable = false, unique = true, length = 100)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "participation_uid", referencedColumnName = "uid", nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
     @NotNull
-    @Length(max = 100)
-    private String code;
+    private QuestParticipation questParticipation;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "submission_status",  nullable = false)
+    @Builder.Default
     @NotNull
-    @Column(name = "badge_type", columnDefinition = "badge_types", nullable = false)
-    private BadgeType badgeType;
+    private SubmissionStatus submissionStatus = SubmissionStatus.PENDING;
 
-    @Column(name = "title", nullable = false, length = 200)
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT", length = 5000)
     @NotNull
-    @Length(max = 200)
-    private String title;
-
-    @Column(name = "description", columnDefinition = "TEXT", length = 5000)
     @Length(max = 5000)
     private String description;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_media_uid", referencedColumnName = "uid", nullable = false)
+    @Column(name = "notes", nullable = false, columnDefinition = "TEXT", length = 1000)
     @NotNull
-    private Media image;
+    @Length(max = 1000)
+    private String notes;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name="rule", nullable = false, columnDefinition="jsonb")
-    @NotNull
-    private Map<String, Object> rule;
+    @Column(name = "submitted_at")
+    private OffsetDateTime submittedAt;
 
-    @Column(name = "is_active", nullable = false)
-    @NotNull
-    private boolean isActive;
+    @Column(name = "rejected_at")
+    private OffsetDateTime rejectedAt;
+
+    @Column(name = "approved_at")
+    private OffsetDateTime approvedAt;
 
     @CreationTimestamp
-    @Column(name="created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     @NotNull
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name="updated_at")
+    @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
+
 }

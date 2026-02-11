@@ -1,7 +1,7 @@
 package sanets.dev.animechallenges.repository.specification;
 
 import org.springframework.data.jpa.domain.Specification;
-import sanets.dev.animechallenges.model.Badge;
+import sanets.dev.animechallenges.model.badge.Badge;
 
 public class BadgeSpecification {
     private BadgeSpecification() {}

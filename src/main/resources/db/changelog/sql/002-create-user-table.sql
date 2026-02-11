@@ -2,7 +2,7 @@
 
 --changeset daniilsanets:002-1
 --comment Create user_roles enum type
-CREATE TYPE user_roles AS ENUM ('GUEST','ROLE_USER','ROLE_ADMIN');
+CREATE TYPE user_roles AS ENUM ('ROLE_GUEST','ROLE_USER','ROLE_ADMIN');
 --rollback DROP TYPE user_roles;
 
 --changeset daniilsanets:002-2

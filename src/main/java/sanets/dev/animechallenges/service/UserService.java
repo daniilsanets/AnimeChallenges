@@ -7,8 +7,8 @@ import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
 import sanets.dev.animechallenges.mapper.UserMapper;
-import sanets.dev.animechallenges.model.Media;
-import sanets.dev.animechallenges.model.User;
+import sanets.dev.animechallenges.model.media.Media;
+import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.UserRepository;
 
 import java.util.UUID;

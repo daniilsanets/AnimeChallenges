@@ -6,8 +6,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import sanets.dev.animechallenges.dto.badge.BadgeRequestDto;
 import sanets.dev.animechallenges.dto.badge.BadgeResponseDto;
-import sanets.dev.animechallenges.model.Badge;
-import sanets.dev.animechallenges.model.Media;
+import sanets.dev.animechallenges.model.badge.Badge;
+import sanets.dev.animechallenges.model.media.Media;
 
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, unmappedSourcePolicy = ReportingPolicy.ERROR)

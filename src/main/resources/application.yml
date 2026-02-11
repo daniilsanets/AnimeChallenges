@@ -16,3 +16,6 @@ jwt:
 file:
     upload-dir: /var/anime-challenges/data
     base-url: /api/v1/media/
+
+media:
+    max-uploaded-media: 5

@@ -10,7 +10,7 @@ import sanets.dev.animechallenges.exception.media.MediaNotDeletedException;
 import sanets.dev.animechallenges.exception.media.MediaNotFoundException;
 import sanets.dev.animechallenges.exception.media.MediaNotUploadedException;
 import sanets.dev.animechallenges.mapper.MediaMapper;
-import sanets.dev.animechallenges.model.Media;
+import sanets.dev.animechallenges.model.media.Media;
 import sanets.dev.animechallenges.repository.MediaRepository;
 
 import java.io.IOException;

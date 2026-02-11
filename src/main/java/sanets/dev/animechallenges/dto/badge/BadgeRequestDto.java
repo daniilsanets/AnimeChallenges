@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import sanets.dev.animechallenges.model.BadgeType;
+import sanets.dev.animechallenges.model.badge.BadgeType;
 
 import java.util.Map;
 
