@@ -7,6 +7,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import sanets.dev.animechallenges.dto.user.AdminUserProfileResponseDto;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
 import sanets.dev.animechallenges.model.user.User;
@@ -18,7 +19,13 @@ import sanets.dev.animechallenges.model.user.User;
 public interface UserMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
-           "uid", "passwordHash", "createdAt", "updatedAt",
+           "uid", "passwordHash", "createdAt", "updatedAt"
+    })
+    @Mapping(source = "user.avatar.uid", target = "avatarUid")
+    AdminUserProfileResponseDto toAdminUserProfileResponseDto(User user);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {
+            "uid", "passwordHash", "createdAt", "updatedAt","email", "role", "isActive"
     })
     @Mapping(source = "user.avatar.uid", target = "avatarUid")
     UserProfileResponseDto toUserProfileResponseDto(User user);

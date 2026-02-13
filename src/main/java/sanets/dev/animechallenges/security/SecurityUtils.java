@@ -12,6 +12,13 @@ public class SecurityUtils {
 
     private SecurityUtils() {}
 
+    /**
+     * This method checks for user ability to change the data state
+     * by its ownership of source or its role.
+     *
+     * @param ownerUsername get from invocation point
+     * @throws InvalidAccessException when source isn't allowed
+     */
     public static void validateUserAccessByUsername(String ownerUsername) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

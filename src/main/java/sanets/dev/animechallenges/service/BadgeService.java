@@ -22,7 +22,6 @@ import sanets.dev.animechallenges.model.quest.Quest;
 import sanets.dev.animechallenges.model.quest.QuestStatus;
 import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.BadgeRepository;
-import sanets.dev.animechallenges.repository.QuestParticipationRepository;
 import sanets.dev.animechallenges.repository.UserBadgeRepository;
 
 import java.time.OffsetDateTime;
@@ -30,6 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.BADGE_NOT_FOUND_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.BADGE_NOT_SAVED_MSG;
 import static sanets.dev.animechallenges.repository.specification.BadgeSpecification.isActive;
 import static sanets.dev.animechallenges.repository.specification.BadgeSpecification.nameContains;
 
@@ -37,12 +38,11 @@ import static sanets.dev.animechallenges.repository.specification.BadgeSpecifica
 @Service
 @RequiredArgsConstructor
 public class BadgeService {
-    private static final String BADGE_NOT_FOUND_MSG = "Badge not found";
-    private static final String BADGE_NOT_SAVED_MSG = "Failed to save badge";
 
     private final UserBadgeRepository userBadgeRepository;
     private final BadgeRepository badgeRepository;
-    private final QuestParticipationRepository questParticipationRepository; //use a service when it will be present
+    private final QuestParticipationService questParticipationService;
+    private final UserService userService;
     private final BadgeMapper badgeMapper;
     private final MediaService mediaService;
 
@@ -51,11 +51,8 @@ public class BadgeService {
         return userBadgeRepository.findByUserUidAndBadgeUid(user.getUid(), badge.getUid()).isPresent();
     }
 
-    private boolean saveBadgeToUser(User user, Badge badge) {
-        return saveBadgeToUser(user, badge, false);
-    }
-
-    public boolean saveBadgeToUser(User user, Badge badge, boolean forced) {
+    public boolean saveBadgeToUser(UUID uid, Badge badge, boolean forced) {
+        User user = userService.getUserByUid(uid);
 
         if (userHasBadge(user, badge) && !forced) {
             log.debug("User {} badge {} not saved because it has badge", user.getUid(), badge);
@@ -66,28 +63,24 @@ public class BadgeService {
         return userBadgeRepository.insertUserBadge(user.getUid(), badge.getUid(), OffsetDateTime.now()) == 1;
     }
 
-    public boolean tryAssignAchievement(User user, Badge badge, Long currentCount) {
+    public boolean tryAssignAchievement(UUID userUid, Badge badge, Long currentCount) {
         Object countRule = badge.getRule().get("count");
 
         if (countRule == null || !(currentCount >= ((Number) countRule).longValue())) {
-            log.debug("User {} cannot get achievement {} due to it has it or countRule is null", user.getUid(), badge.getUid());
+            log.debug("User {} cannot get achievement {} due to it has it or countRule is null", userUid, badge.getUid());
             return false;
         }
-        saveBadgeToUser(user, badge, true);
+        saveBadgeToUser(userUid, badge, true);
         return true;
     }
 
-    public void tryAssignQuestReward(User user, Badge badge) {
-        saveBadgeToUser(user, badge);
-    }
-
     @Transactional
-    public void processQuestCompletion(User user, Quest quest) {
+    public void processQuestCompletion(UUID userUid, Quest quest) {
 
-        log.debug("Trying to get completed quest number to user {}", user.getUid());
-        Long numberOfCompletedQuests = questParticipationRepository.countByPerformerAndQuestStatus(user, QuestStatus.APPROVED);
+        log.debug("Trying to get completed quest number to user {}", userUid);
+        Long numberOfCompletedQuests = questParticipationService.getCountByPerformerAndQuestStatus(userUid, QuestStatus.APPROVED);
 
-        Set<UUID> ownedBadgeIds = userBadgeRepository.findBadgeIdsByUser(user.getUid());
+        Set<UUID> ownedBadgeIds = userBadgeRepository.findBadgeIdsByUser(userUid);
 
         List<Badge> achievements = badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT);
 
@@ -95,7 +88,7 @@ public class BadgeService {
         achievements.stream()
                 .filter(badge -> !ownedBadgeIds.contains(badge.getUid()))
                 .forEach(badge -> {
-                    if (tryAssignAchievement(user, badge, numberOfCompletedQuests)) {
+                    if (tryAssignAchievement(userUid, badge, numberOfCompletedQuests)) {
                         ownedBadgeIds.add(badge.getUid());
                         log.debug("User badge uid was added to its owned list of badges");
                     }
@@ -103,8 +96,8 @@ public class BadgeService {
 
         Badge questBadge = quest.getBadge();
         if (questBadge != null && !ownedBadgeIds.contains(questBadge.getUid())) {
-            saveBadgeToUser(user, questBadge, true);
-            log.info("User {} take its reward", user.getUid());
+            saveBadgeToUser(userUid, questBadge, true);
+            log.info("User {} take its reward", userUid);
         }
     }
 
@@ -158,5 +151,9 @@ public class BadgeService {
     public Badge getBadgeByUid(UUID badgeUid) {
         return badgeRepository.findBadgeByUid(badgeUid)
                 .orElseThrow(() -> new BadgeNotFoundException(BADGE_NOT_FOUND_MSG));
+    }
+
+    public boolean saveBadgeToUser(UUID userUid, Badge badge) {
+        return saveBadgeToUser(userUid, badge, false);
     }
 }

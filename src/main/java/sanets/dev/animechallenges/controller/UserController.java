@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sanets.dev.animechallenges.dto.user.AdminUserProfileResponseDto;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
-import sanets.dev.animechallenges.model.user.UserRole;
-import sanets.dev.animechallenges.security.SecurityUtils;
 import sanets.dev.animechallenges.service.UserService;
 
 import java.util.UUID;
+
+import static sanets.dev.animechallenges.security.SecurityUtils.*;
 
 @RestController
 @RequestMapping("/api/v1/profile")
@@ -26,25 +27,33 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/")
-    public UserProfileResponseDto getUserProfile() {
-        return userService.getUserProfileByUid(SecurityUtils.getCurrentUserUid());
+    @ResponseStatus(HttpStatus.OK)
+    public UserProfileResponseDto getCurrentUserProfile() {
+        return userService.getUserProfileByUid(getCurrentUserUid());
     }
 
     @GetMapping("/{uid}")
     @ResponseStatus(HttpStatus.OK)
-    public UserProfileResponseDto getUserProfile(@PathVariable UUID uid) {
+    public UserProfileResponseDto getUserProfileByUid(@PathVariable UUID uid) {
         return userService.getUserProfileByUid(uid);
     }
 
-    @PatchMapping()
-    public UserProfileResponseDto updateProfile(@RequestBody UpdateUserProfileRequestDto updateDto){
-        return userService.updateUserProfileByUId(SecurityUtils.getCurrentUserUid(), updateDto);
+    @GetMapping("/admin/{uid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public AdminUserProfileResponseDto getAdminUserProfileByUid(@PathVariable UUID uid) {
+        return userService.getExtendedUserProfileByUid(uid);
     }
 
-    ///todo in the future realises
-//    @DeleteMapping()
-//    @PreAuthorize("hasRole()")
-//    public void deleteUserProfile(@PathVariable UUID uid){
-//
-//    }
+    @PatchMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public UserProfileResponseDto updateProfile(@RequestBody UpdateUserProfileRequestDto updateDto){
+        return userService.updateUserProfileByUId(updateDto);
+    }
+
+    @DeleteMapping("/admin/{uid}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteUser(@PathVariable UUID uid){
+        userService.deleteUserByUid(uid);
+    }
 }

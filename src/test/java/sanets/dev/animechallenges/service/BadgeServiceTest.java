@@ -18,7 +18,6 @@ import sanets.dev.animechallenges.model.quest.Quest;
 import sanets.dev.animechallenges.model.quest.QuestStatus;
 import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.BadgeRepository;
-import sanets.dev.animechallenges.repository.QuestParticipationRepository;
 import sanets.dev.animechallenges.repository.UserBadgeRepository;
 
 import java.util.HashSet;
@@ -43,7 +42,7 @@ public class BadgeServiceTest {
     @Mock
     private MediaService mediaService;
     @Mock
-    private QuestParticipationRepository questParticipationRepository;
+    private QuestParticipationService questParticipationService;
     @Mock
     private UserBadgeRepository userBadgeRepository;
 
@@ -127,12 +126,12 @@ public class BadgeServiceTest {
 
         Quest quest = new Quest();
 
-        when(questParticipationRepository.countByPerformerAndQuestStatus(user, QuestStatus.APPROVED)).thenReturn(5L);
+        when(questParticipationService.getCountByPerformerAndQuestStatus(user, QuestStatus.APPROVED)).thenReturn(5L);
 
         when(userBadgeRepository.findBadgeIdsByUser(userId)).thenReturn(new HashSet<>());
         when(badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT)).thenReturn(List.of(badge));
 
-        badgeService.processQuestCompletion(user, quest);
+        badgeService.processQuestCompletion(user.getUid(), quest);
 
         verify(userBadgeRepository).insertUserBadge(eq(userId), eq(badgeId), any());
     }
@@ -153,7 +152,7 @@ public class BadgeServiceTest {
                 .badge(badge)
                 .build();
 
-        when(questParticipationRepository.countByPerformerAndQuestStatus(any(), any()))
+        when(questParticipationService.getCountByPerformerAndQuestStatus(any(User.class), any()))
                 .thenReturn(0L);
 
         when(userBadgeRepository.findBadgeIdsByUser(userUid))
@@ -161,7 +160,7 @@ public class BadgeServiceTest {
 
         when(badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT))
                 .thenReturn(List.of());
-        badgeService.processQuestCompletion(user, quest);
+        badgeService.processQuestCompletion(user.getUid(), quest);
 
         verify(userBadgeRepository).insertUserBadge(eq(userUid), eq(badgeId), any());
     }

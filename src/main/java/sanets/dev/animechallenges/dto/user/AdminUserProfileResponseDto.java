@@ -8,9 +8,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class UserProfileResponseDto {
+public class AdminUserProfileResponseDto {
+    private String email;
     private String username;
+    private UserRole role;
     private String nickname;
     private String bio;
     private UUID avatarUid;
+    private Boolean isActive;
 }

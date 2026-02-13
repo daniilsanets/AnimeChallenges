@@ -96,6 +96,15 @@ public class QuestParticipationService {
                 .orElseThrow(() -> new ParticipationNotFoundException(QUEST_PARTICIPATION_NOT_FOUND_MSG));
     }
 
+    public Long getCountByPerformerAndQuestStatus(User performer, QuestStatus questStatus) {
+        return questParticipationRepository.countByPerformerAndQuestStatus(performer, questStatus);
+    }
+
+    public Long getCountByPerformerAndQuestStatus(UUID performerUid, QuestStatus questStatus) {
+        User performer = userService.getUserByUid(performerUid);
+        return questParticipationRepository.countByPerformerAndQuestStatus(performer, questStatus);
+    }
+
     private void validateCanParticipate(User user, Quest quest){
         if (questParticipationRepository.existsByPerformerAndQuest(user, quest)){
             throw new AlreadyParticipatingException(ALREADY_PARTICIPATING_MSG);
