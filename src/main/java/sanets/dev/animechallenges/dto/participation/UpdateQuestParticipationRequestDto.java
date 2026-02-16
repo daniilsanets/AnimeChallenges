@@ -6,13 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import sanets.dev.animechallenges.model.quest.QuestStatus;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 public class UpdateQuestParticipationRequestDto {
-    @NotNull
-    private UUID participationUid;
 
     @NotNull
     private QuestStatus questStatus;

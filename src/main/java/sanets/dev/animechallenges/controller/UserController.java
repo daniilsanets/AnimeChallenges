@@ -21,7 +21,7 @@ import java.util.UUID;
 import static sanets.dev.animechallenges.security.SecurityUtils.*;
 
 @RestController
-@RequestMapping("/api/v1/profile")
+@RequestMapping("/api/v1/profiles")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;

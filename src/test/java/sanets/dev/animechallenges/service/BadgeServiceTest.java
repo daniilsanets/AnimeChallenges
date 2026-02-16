@@ -126,7 +126,7 @@ public class BadgeServiceTest {
 
         Quest quest = new Quest();
 
-        when(questParticipationService.getCountByPerformerAndQuestStatus(user, QuestStatus.APPROVED)).thenReturn(5L);
+        when(questParticipationService.getCountByPerformerAndQuestStatus(user.getUid(), QuestStatus.APPROVED)).thenReturn(5L);
 
         when(userBadgeRepository.findBadgeIdsByUser(userId)).thenReturn(new HashSet<>());
         when(badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT)).thenReturn(List.of(badge));
@@ -152,7 +152,7 @@ public class BadgeServiceTest {
                 .badge(badge)
                 .build();
 
-        when(questParticipationService.getCountByPerformerAndQuestStatus(any(User.class), any()))
+        when(questParticipationService.getCountByPerformerAndQuestStatus(any(UUID.class), any()))
                 .thenReturn(0L);
 
         when(userBadgeRepository.findBadgeIdsByUser(userUid))

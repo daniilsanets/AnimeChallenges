@@ -3,10 +3,16 @@ package sanets.dev.animechallenges.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sanets.dev.animechallenges.exception.common.InvalidAccessException;
+import sanets.dev.animechallenges.exception.participation.AlreadyParticipatingException;
+import sanets.dev.animechallenges.exception.quest.QuestNotAvailable;
+import sanets.dev.animechallenges.model.quest.Quest;
+import sanets.dev.animechallenges.model.user.User;
 
 import java.util.UUID;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.ALREADY_PARTICIPATING_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.INVALID_ACCESS_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_NOT_AVAILABLE_MSG;
 
 public class SecurityUtils {
 
@@ -20,17 +26,29 @@ public class SecurityUtils {
      * @throws InvalidAccessException when source isn't allowed
      */
     public static void validateUserAccessByUsername(String ownerUsername) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("admin"));
-
-        if (isAdmin) {
+        if (isAdmin()) {
             return;
         }
 
-        String currentUsername = authentication.getName();
+        String currentUsername = getCurrentUsername();
         if (!currentUsername.equals(ownerUsername)) {
+            throw new InvalidAccessException(INVALID_ACCESS_MSG);
+        }
+    }
+
+    /**
+     * This method checks for user ability to change the data state
+     * by its ownership of source or its role.
+     *
+     * @param userUid get from invocation point
+     * @throws InvalidAccessException when source isn't allowed
+     */
+    public static void validateUserAccessByUserUid(UUID userUid) {
+        if (isAdmin()) {
+            return;
+        }
+
+        if (!getCurrentUserUid().equals(userUid)) {
             throw new InvalidAccessException(INVALID_ACCESS_MSG);
         }
     }

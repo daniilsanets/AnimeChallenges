@@ -2,6 +2,8 @@ package sanets.dev.animechallenges.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import sanets.dev.animechallenges.dto.participation.UpdateQuestParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.CreateParticipationRequestDto;
@@ -18,15 +20,14 @@ import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.QuestParticipationRepository;
 import sanets.dev.animechallenges.security.SecurityUtils;
 
-import java.util.List;
 import java.util.UUID;
-import static java.util.stream.Collectors.toList;
 import static sanets.dev.animechallenges.exception.ErrorMessages.ALREADY_PARTICIPATING_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.INVALID_ACCESS_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_NOT_AVAILABLE_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_PARTICIPATION_NOT_FOUND_MSG;
 import static sanets.dev.animechallenges.security.SecurityUtils.getCurrentUsername;
 import static sanets.dev.animechallenges.security.SecurityUtils.isAdmin;
+import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccessByUserUid;
 import static sanets.dev.animechallenges.security.SecurityUtils.validateUserAccessByUsername;
 
 @Slf4j
@@ -54,14 +55,17 @@ public class QuestParticipationService {
         return questParticipationMapper.toQuestParticipationResponseDto(participation);
     }
 
-    public List<QuestParticipationResponseDto> getAllQuestParticipationByUserUid(UUID userUid) {
-        return questParticipationRepository.findAllByPerformerUid(userUid).stream()
-                .map(questParticipationMapper::toQuestParticipationResponseDto)
-                .collect(toList());
+    public Page<QuestParticipationResponseDto> getAllQuestParticipationByUserUid(UUID userUid, Pageable pageable) {
+        validateUserAccessByUserUid(userUid);
+
+        return questParticipationRepository
+                .findAllByPerformerUid(userUid, pageable)
+                .map(questParticipationMapper::toQuestParticipationResponseDto);
     }
 
-    public QuestParticipationResponseDto updateQuestParticipation(UpdateQuestParticipationRequestDto dto){
-        QuestParticipation questParticipationToUpdate = getQuestParticipationByUid(dto.getParticipationUid());
+    //todo: split updating status, cannot be after pending(state pattern)
+    public QuestParticipationResponseDto updateQuestParticipation(UUID participationUid, UpdateQuestParticipationRequestDto dto){
+        QuestParticipation questParticipationToUpdate = getQuestParticipationByUid(participationUid);
 
         User performer = questParticipationToUpdate.getPerformer();
 
@@ -74,7 +78,8 @@ public class QuestParticipationService {
         return questParticipationMapper.toQuestParticipationResponseDto(questParticipationToUpdate);
     }
 
-    public void deleteParticipationByUid(UUID questParticipation) {
+
+    public void cancelParticipationByUid(UUID questParticipation) {
         QuestParticipation participationToDelete = getQuestParticipationByUid(questParticipation);
 
         User performer = participationToDelete.getPerformer();
@@ -96,8 +101,8 @@ public class QuestParticipationService {
                 .orElseThrow(() -> new ParticipationNotFoundException(QUEST_PARTICIPATION_NOT_FOUND_MSG));
     }
 
-    public Long getCountByPerformerAndQuestStatus(User performer, QuestStatus questStatus) {
-        return questParticipationRepository.countByPerformerAndQuestStatus(performer, questStatus);
+    public QuestParticipationResponseDto getQuestParticipationResponseByUid(UUID questParticipation) {
+        return questParticipationMapper.toQuestParticipationResponseDto(getQuestParticipationByUid(questParticipation));
     }
 
     public Long getCountByPerformerAndQuestStatus(UUID performerUid, QuestStatus questStatus) {

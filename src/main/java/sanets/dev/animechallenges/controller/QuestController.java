@@ -37,6 +37,7 @@ public class QuestController {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public Page<QuestResponseDto> getQuests(
             QuestFilterDto filterDto,
             @PageableDefault(size = 20) Pageable pageable
@@ -45,6 +46,7 @@ public class QuestController {
     }
 
     @PutMapping("/{uid}")
+    @ResponseStatus(HttpStatus.OK)
     public void updateQuest(
             @PathVariable UUID uid,
             @RequestBody @Valid UpdateQuestRequestDto dto

@@ -16,9 +16,6 @@ import sanets.dev.animechallenges.model.user.User;
     unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface QuestParticipationMapper {
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {
-                    "participationUid"
-            })
     @Mapping(target = "uid", ignore = true)
     @Mapping(target = "performer", ignore = true)
     @Mapping(target = "quest", ignore = true)
