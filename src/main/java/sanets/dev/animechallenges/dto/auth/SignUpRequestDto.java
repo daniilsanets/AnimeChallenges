@@ -19,9 +19,6 @@ public class SignUpRequestDto {
     @NotNull
     private String email;
 
-    /*
-    I don't get it enough( In our DB we have hashed password unlike here user give us his none-hashed password
-     */
     @Length(max = 200)
     @NotNull
     private String password;

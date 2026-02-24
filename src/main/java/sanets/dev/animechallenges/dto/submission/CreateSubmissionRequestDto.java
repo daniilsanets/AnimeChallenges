@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import sanets.dev.animechallenges.model.media.Media;
+import org.springframework.web.multipart.MultipartFile;
 import sanets.dev.animechallenges.model.submission.SubmissionStatus;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class CreateSubmissionRequestDto {
     @NotNull
     private SubmissionStatus submissionStatus;
 
-    private List<Media> media;
+    private List<MultipartFile> multipartFiles;
 
     @NotNull
     @Length(max = 5000)

@@ -3,16 +3,9 @@ package sanets.dev.animechallenges.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import sanets.dev.animechallenges.exception.common.InvalidAccessException;
-import sanets.dev.animechallenges.exception.participation.AlreadyParticipatingException;
-import sanets.dev.animechallenges.exception.quest.QuestNotAvailable;
-import sanets.dev.animechallenges.model.quest.Quest;
-import sanets.dev.animechallenges.model.user.User;
-
 import java.util.UUID;
 
-import static sanets.dev.animechallenges.exception.ErrorMessages.ALREADY_PARTICIPATING_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.INVALID_ACCESS_MSG;
-import static sanets.dev.animechallenges.exception.ErrorMessages.QUEST_NOT_AVAILABLE_MSG;
 
 public class SecurityUtils {
 
@@ -56,7 +49,7 @@ public class SecurityUtils {
     public static boolean isAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("admin"));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     public static UUID getCurrentUserUid() {

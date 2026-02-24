@@ -24,7 +24,7 @@ public interface QuestMapper {
     @Mapping(target = "creator", ignore = true)
     @Mapping(target = "badge", ignore = true)
     @Mapping(target = "uid" , ignore = true)
-    @Mapping(target = "isActive" , ignore = true)
+    @Mapping(target = "active" , ignore = true)
     @Mapping(target = "createdAt" , ignore = true)
     @Mapping(target = "updatedAt" , ignore = true)
     Quest toQuest(CreateQuestRequestDto createQuestRequestDto);
@@ -36,7 +36,7 @@ public interface QuestMapper {
     @Mapping(target = "title", ignore = true)
     @Mapping(target = "creator", ignore = true)
     @Mapping(target = "badge", ignore = true)
-    @Mapping(target = "isActive", ignore = true)
+    @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     void updateQuestFromDto(UpdateQuestRequestDto dto, @MappingTarget Quest quest);

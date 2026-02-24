@@ -62,6 +62,7 @@ public class QuestParticipation {
     @NotNull
     private QuestStatus questStatus;
 
+    @CreationTimestamp
     @Column(name = "started_at")
     private OffsetDateTime startedAt;
 
@@ -73,7 +74,6 @@ public class QuestParticipation {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
-    @NotNull
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp

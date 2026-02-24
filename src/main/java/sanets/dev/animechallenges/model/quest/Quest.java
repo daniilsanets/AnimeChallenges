@@ -85,18 +85,16 @@ public class Quest {
     @NotNull
     private User creator;
 
-    @Column(name = "is_active")
-    private Boolean isActive = true;
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
-    @NotNull
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    @NotNull
     private OffsetDateTime updatedAt;
 
 }

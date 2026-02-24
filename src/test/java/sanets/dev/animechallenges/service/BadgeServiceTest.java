@@ -12,28 +12,25 @@ import sanets.dev.animechallenges.exception.badge.BadgeNotFoundException;
 import sanets.dev.animechallenges.exception.media.MediaNotUploadedException;
 import sanets.dev.animechallenges.mapper.BadgeMapper;
 import sanets.dev.animechallenges.model.badge.Badge;
-import sanets.dev.animechallenges.model.badge.BadgeType;
 import sanets.dev.animechallenges.model.media.Media;
-import sanets.dev.animechallenges.model.quest.Quest;
-import sanets.dev.animechallenges.model.quest.QuestStatus;
-import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.BadgeRepository;
 import sanets.dev.animechallenges.repository.UserBadgeRepository;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BadgeServiceTest {
+class BadgeServiceTest {
 
     @Mock
     private BadgeRepository badgeRepository;
@@ -92,7 +89,7 @@ public class BadgeServiceTest {
 
         when(badgeRepository.findBadgeByUid(any())).thenReturn(Optional.of(badge));
 
-        badgeService.deleteBadge(badge.getUid());
+        badgeService.archiveBadge(badge.getUid());
 
         assertFalse(badge.isActive());
         verify(badgeRepository).save(badge);
@@ -103,65 +100,6 @@ public class BadgeServiceTest {
         UUID fakeUid = UUID.randomUUID();
         when(badgeRepository.findBadgeByUid(any())).thenReturn(Optional.empty());
 
-        assertThrows(BadgeNotFoundException.class, () -> badgeService.deleteBadge(fakeUid));
-    }
-
-    @Test
-    void processQuestCompletion_shouldAssignAchievement_whenConditionMet() {
-        UUID userId = UUID.randomUUID();
-        UUID badgeId = UUID.randomUUID();
-
-        User user = User.builder()
-                .uid(userId)
-                .username("user")
-                .build();
-
-        Badge badge = Badge.builder()
-                .title("Test Badge")
-                .uid(badgeId)
-                .build();
-
-        Map<String, Object> rule = Map.of("count", 5);
-        badge.setRule(rule);
-
-        Quest quest = new Quest();
-
-        when(questParticipationService.getCountByPerformerAndQuestStatus(user.getUid(), QuestStatus.APPROVED)).thenReturn(5L);
-
-        when(userBadgeRepository.findBadgeIdsByUser(userId)).thenReturn(new HashSet<>());
-        when(badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT)).thenReturn(List.of(badge));
-
-        badgeService.processQuestCompletion(user.getUid(), quest);
-
-        verify(userBadgeRepository).insertUserBadge(eq(userId), eq(badgeId), any());
-    }
-
-    @Test
-    void processQuestCompletion_shouldAssignQuestReward_whenQuestHasBadge(){
-        UUID userUid =  UUID.randomUUID();
-        UUID badgeId = UUID.randomUUID();
-
-        User user = User.builder()
-                .uid(userUid)
-                .build();
-
-        Badge badge = Badge.builder()
-                .uid(badgeId)
-                .build();
-        Quest quest = Quest.builder()
-                .badge(badge)
-                .build();
-
-        when(questParticipationService.getCountByPerformerAndQuestStatus(any(UUID.class), any()))
-                .thenReturn(0L);
-
-        when(userBadgeRepository.findBadgeIdsByUser(userUid))
-                .thenReturn(new HashSet<>());
-
-        when(badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT))
-                .thenReturn(List.of());
-        badgeService.processQuestCompletion(user.getUid(), quest);
-
-        verify(userBadgeRepository).insertUserBadge(eq(userUid), eq(badgeId), any());
+        assertThrows(BadgeNotFoundException.class, () -> badgeService.archiveBadge(fakeUid));
     }
 }

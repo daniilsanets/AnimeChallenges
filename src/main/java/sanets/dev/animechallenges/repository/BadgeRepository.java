@@ -23,7 +23,7 @@ public interface BadgeRepository extends JpaRepository<Badge, UUID>, JpaSpecific
     FROM Badge b 
     JOIN UserBadge ub ON ub.badge = b 
     LEFT JOIN FETCH b.image 
-    WHERE ub.user.uid = :userId
+    WHERE ub.user.uid = :userUid
 """)
-    List<Badge> findAllBadgesByUserId(@Param("userUid") UUID userId);
+    List<Badge> findAllBadgesByUserId(@Param("userUid") UUID userUid);
 }

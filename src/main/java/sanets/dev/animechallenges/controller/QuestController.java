@@ -8,6 +8,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,7 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class QuestController {
 
-    private QuestService questService;
+    private final QuestService questService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -45,7 +46,7 @@ public class QuestController {
         return questService.getQuestsWithFilter(filterDto, pageable);
     }
 
-    @PutMapping("/{uid}")
+    @PatchMapping("/{uid}")
     @ResponseStatus(HttpStatus.OK)
     public void updateQuest(
             @PathVariable UUID uid,

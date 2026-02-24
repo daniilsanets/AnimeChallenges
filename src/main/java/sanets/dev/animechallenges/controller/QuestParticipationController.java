@@ -30,7 +30,7 @@ public class QuestParticipationController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public QuestParticipationResponseDto createParticipation(@RequestBody() CreateParticipationRequestDto createParticipationRequestDto) {
+    public QuestParticipationResponseDto createParticipation(@RequestBody CreateParticipationRequestDto createParticipationRequestDto) {
         return questParticipationService.createQuestParticipation(createParticipationRequestDto);
     }
 
@@ -42,7 +42,7 @@ public class QuestParticipationController {
     @GetMapping("/admin/users/{userUid}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<QuestParticipationResponseDto> getAllParticipations(
+    public Page<QuestParticipationResponseDto> getAllParticipationsByUserUid(
             @PathVariable UUID userUid,
             @PageableDefault(20) Pageable pageable) {
         return questParticipationService.getAllQuestParticipationByUserUid(userUid, pageable);

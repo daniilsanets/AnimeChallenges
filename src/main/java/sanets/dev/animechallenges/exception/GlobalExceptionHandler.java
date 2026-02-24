@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import sanets.dev.animechallenges.exception.auth.TokenRefreshException;
 import sanets.dev.animechallenges.exception.auth.UserAlreadyExistsException;
 import sanets.dev.animechallenges.exception.auth.WrongPasswordException;
+import sanets.dev.animechallenges.exception.badge.BadgeNotFoundException;
+import sanets.dev.animechallenges.exception.submission.SubmissionIsFinalizedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,5 +31,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenRefreshException.class)
     public ResponseEntity<String> handleTokenRefresh(TokenRefreshException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(BadgeNotFoundException.class)
+    public ResponseEntity<String> handleBadgeNotFound(BadgeNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(SubmissionIsFinalizedException.class)
+    public ResponseEntity<String> handleSubmissionIsFinalized(SubmissionIsFinalizedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }

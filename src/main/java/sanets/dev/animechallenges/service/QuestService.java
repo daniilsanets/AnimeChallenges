@@ -45,6 +45,7 @@ public class QuestService {
 
         Quest quest = questMapper.toQuest(createQuestRequestDto);
         quest.setBadge(badge);
+        quest.setActive(true);
         quest.setCreator(creator);
 
         Quest savedQuest = questRepository.save(quest);
@@ -53,7 +54,7 @@ public class QuestService {
 
     public Page<QuestResponseDto> getQuestsWithFilter(QuestFilterDto filterDto, Pageable pageable) {
         Specification<Quest> spec = Specification.where(titleContains(filterDto.getTitle()))
-                .and(isActive(filterDto.getIsActive()))
+                .and(isActive(filterDto.isActive()))
                 .and(hasDifficulty(filterDto.getDifficulty()))
                 .and(hasRewardPoints(filterDto.getRewardPoints()))
                 .and(hasMaxAttempts(filterDto.getMaxAttempts()));
@@ -79,7 +80,7 @@ public class QuestService {
 
         validateUserAccessByUsername(quest.getCreator().getUsername());
 
-        quest.setIsActive(false);
+        quest.setActive(false);
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Quest deleted successfully with id: {}", savedQuest.getUid());

@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.web.multipart.MultipartFile;
+import sanets.dev.animechallenges.dto.media.MediaResponseDto;
 import sanets.dev.animechallenges.model.media.Media;
 import sanets.dev.animechallenges.model.media.MediaType;
 
@@ -12,6 +13,11 @@ import static sanets.dev.animechallenges.exception.ErrorMessages.INVALID_MEDIA_C
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, unmappedSourcePolicy = ReportingPolicy.ERROR)
 public interface MediaMapper {
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {
+            "size", "createdAt", "updatedAt"
+    })
+    MediaResponseDto toMediaResponseDto(Media media);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
             "name", "originalFilename", "inputStream", "resource"

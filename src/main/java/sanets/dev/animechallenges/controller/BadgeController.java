@@ -1,5 +1,6 @@
 package sanets.dev.animechallenges.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/badges")
 public class BadgeController {
 
-    private BadgeService badgeService;
+    private final BadgeService badgeService;
 
     @GetMapping
     public Page<BadgeResponseDto> getBadges(BadgeFilterDto filter, Pageable pageable) {
@@ -39,13 +40,13 @@ public class BadgeController {
     @GetMapping("/{uid}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public Badge getBadgeByUid(@PathVariable UUID uid) {
-        return badgeService.getBadgeByUid(uid);
+    public BadgeResponseDto getBadgeByUid(@PathVariable UUID uid) {
+        return badgeService.getBadgeDtoByUid(uid);
     }
 
-    @PostMapping
+    @PostMapping(consumes = {"multipart/form-data"})
     @ResponseStatus(HttpStatus.CREATED)
-    public void createBadge(@RequestPart("badge") BadgeRequestDto badgeRequestDto,
+    public void createBadge(@RequestPart("badge") @Valid BadgeRequestDto badgeRequestDto,
                             @RequestPart("file") MultipartFile file) {
         badgeService.createBadge(badgeRequestDto, file);
     }
@@ -53,8 +54,8 @@ public class BadgeController {
     @DeleteMapping("/{uid}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBadge(@PathVariable UUID uid) {
-        badgeService.deleteBadge(uid);
+    public void archiveBadge(@PathVariable UUID uid) {
+        badgeService.archiveBadge(uid);
     }
 
     @GetMapping("/user/{userId}")

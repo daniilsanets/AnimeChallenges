@@ -1,6 +1,9 @@
 spring:
     application:
         name: AnimeChallenges
+    servlet:
+        multipart:
+            max-file-size: 5MB
     datasource:
         url: jdbc:postgresql://localhost:5432/anime_challenges
         username: postgres

@@ -83,7 +83,6 @@ public class Badge {
     @CreationTimestamp
     @Column(name="created_at", nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
-    @NotNull
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
