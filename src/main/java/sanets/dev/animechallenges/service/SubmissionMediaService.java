@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sanets.dev.animechallenges.exception.media.MediaNotUploadedException;
 import sanets.dev.animechallenges.exception.submission.SubmissionIsFinalizedException;
 import sanets.dev.animechallenges.exception.submission.SubmissionMediaLimitExceededException;
 import sanets.dev.animechallenges.model.media.Media;
@@ -15,6 +16,8 @@ import sanets.dev.animechallenges.repository.SubmissionMediaRepository;
 
 import java.util.List;
 
+import static sanets.dev.animechallenges.exception.ErrorMessages.MEDIA_NOT_UPLOADED_TO_SERVER_MSG;
+import static sanets.dev.animechallenges.exception.ErrorMessages.MEDIA_NOT_UPLOADED_TO_SUBMISSION_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.SUBMISSION_MEDIA_LIMIT_EXCEEDED_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.SUBMISSION_NOT_AVAILABLE_MSG;
 import static sanets.dev.animechallenges.mapper.MediaMapper.mapMimeTypeToMediaType;
@@ -32,8 +35,9 @@ public class SubmissionMediaService {
     @Transactional
     public void attachToSubmission(Submission submission, List<Media> mediaList) {
 
+        //or I can attach annotation @NotNull to media_list in entity
         if (mediaList == null || mediaList.isEmpty()) {
-            return;
+            throw new MediaNotUploadedException(MEDIA_NOT_UPLOADED_TO_SUBMISSION_MSG);
         }
 
         if (!SubmissionStatus.PENDING.equals(submission.getSubmissionStatus())) {
@@ -41,7 +45,7 @@ public class SubmissionMediaService {
             throw new SubmissionIsFinalizedException(SUBMISSION_NOT_AVAILABLE_MSG);
         }
 
-        long existingCount = submissionMediaRepository.countBySubmissionUid(submission.getUid());
+        Long existingCount = submissionMediaRepository.countBySubmissionUid(submission.getUid());
 
         if (existingCount + mediaList.size() > MAX_UPLOADED_MEDIA) {
             log.error("Media limit exceeded: existing={}, new={}, max={}",

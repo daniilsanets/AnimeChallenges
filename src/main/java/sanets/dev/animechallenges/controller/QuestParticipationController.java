@@ -39,7 +39,7 @@ public class QuestParticipationController {
         return questParticipationService.getQuestParticipationResponseByUid(uid);
     }
 
-    @GetMapping("/admin/users/{userUid}")
+    @PostMapping("/admin/users/{userUid}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     public Page<QuestParticipationResponseDto> getAllParticipationsByUserUid(

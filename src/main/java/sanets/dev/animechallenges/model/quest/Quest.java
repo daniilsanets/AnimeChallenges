@@ -86,7 +86,7 @@ public class Quest {
     private User creator;
 
     @Column(name = "is_active", nullable = false)
-    private boolean active = true;
+    private Boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

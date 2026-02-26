@@ -40,7 +40,7 @@ public class BadgeProcessorService {
         assignQuestRewardBadge(userUid, quest);
     }
 
-    private void assignAchievementBadges(UUID userUid, long completedCount) {
+    private void assignAchievementBadges(UUID userUid, Long completedCount) {
         Set<UUID> ownedBadgeIds = userBadgeRepository.findBadgeIdsByUser(userUid);
         List<Badge> achievements =
                 badgeRepository.findByBadgeType(BadgeType.ACHIEVEMENT);
@@ -50,7 +50,7 @@ public class BadgeProcessorService {
                 continue;
             }
 
-            long required = extractRequiredCount(badge);
+            Long required = extractRequiredCount(badge);
 
             if (completedCount >= required) {
                 badgeService.saveBadgeToUser(userUid, badge, true);

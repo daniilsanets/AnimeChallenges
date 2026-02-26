@@ -32,7 +32,7 @@ public class BadgeController {
 
     private final BadgeService badgeService;
 
-    @GetMapping
+    @PostMapping
     public Page<BadgeResponseDto> getBadges(BadgeFilterDto filter, Pageable pageable) {
         return badgeService.getBadgesWithFilter(filter, pageable);
     }

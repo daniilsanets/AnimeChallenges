@@ -37,7 +37,7 @@ public class QuestController {
         questService.createQuest(dto);
     }
 
-    @GetMapping
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<QuestResponseDto> getQuests(
             QuestFilterDto filterDto,

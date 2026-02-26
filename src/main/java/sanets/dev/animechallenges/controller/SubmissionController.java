@@ -26,7 +26,7 @@ public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    @PostMapping(value = "/" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public SubmissionResponseDto createSubmission(@Valid @ModelAttribute CreateSubmissionRequestDto dto) {
         return submissionService.createSubmission(dto);

@@ -27,7 +27,7 @@ public class MediaController {
 
     //todo:
     // add validation to deny when user upload too much data
-    @PostMapping("/")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public MediaResponseDto createMedia(@RequestPart("file") MultipartFile file){
         return mediaService.uploadMedia(file);
