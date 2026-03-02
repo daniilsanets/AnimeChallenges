@@ -9,6 +9,10 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import sanets.dev.animechallenges.dto.participation.CreateParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.UpdateQuestParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.QuestParticipationResponseDto;
@@ -31,6 +35,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -163,21 +168,37 @@ class QuestParticipationServiceTest {
     }
 
     @Test
-    void getAllQuestParticipationByUserUid_success() {
+    void getAllQuestParticipationByUserUid_withPageable_success() {
         UUID userUid = user.getUid();
-        when(questParticipationRepository.findAllByPerformerUid(userUid)).thenReturn(List.of(participation));
-        when(questParticipationMapper.toQuestParticipationResponseDto(any(QuestParticipation.class))).thenReturn(new QuestParticipationResponseDto());
+        Pageable pageable = PageRequest.of(0, 10);
 
-        List<QuestParticipationResponseDto> result = questParticipationService.getAllQuestParticipationByUserUid(userUid);
+        Page<QuestParticipation> fakePage = new PageImpl<>(List.of(participation));
+
+        securityUtilsMock
+                .when(() -> SecurityUtils.validateUserAccessByUserUid(userUid))
+                .thenAnswer(invocation -> null);
+
+        when(questParticipationRepository.findAllByPerformerUid(userUid, pageable))
+                .thenReturn(fakePage);
+
+        QuestParticipationResponseDto dto = new QuestParticipationResponseDto();
+        when(questParticipationMapper.toQuestParticipationResponseDto(participation)).thenReturn(dto);
+
+        Page<QuestParticipationResponseDto> result =
+                questParticipationService.getAllQuestParticipationByUserUid(userUid, pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(1, result.getTotalElements());
+        assertSame(dto, result.getContent().get(0));
+
+        verify(questParticipationRepository).findAllByPerformerUid(userUid, pageable);
     }
+
+
 
     @Test
     void updateQuestParticipation_success() {
         UpdateQuestParticipationRequestDto dto = new UpdateQuestParticipationRequestDto();
-        dto.setParticipationUid(participation.getUid());
 
         securityUtilsMock.when(() -> SecurityUtils.validateUserAccessByUsername(user.getUsername()))
                 .thenAnswer(invocation -> null);
@@ -189,7 +210,7 @@ class QuestParticipationServiceTest {
         when(questParticipationRepository.save(participation)).thenReturn(participation);
         when(questParticipationMapper.toQuestParticipationResponseDto(participation)).thenReturn(responseDto);
 
-        QuestParticipationResponseDto result = questParticipationService.updateQuestParticipation(dto);
+        QuestParticipationResponseDto result = questParticipationService.updateQuestParticipation(participation.getUid(),dto);
 
         assertNotNull(result);
         verify(questParticipationMapper).updateQuestParticipationFromDto(dto, participation);
@@ -199,17 +220,15 @@ class QuestParticipationServiceTest {
     @Test
     void updateQuestParticipation_throwsNotFound() {
         UpdateQuestParticipationRequestDto dto = new UpdateQuestParticipationRequestDto();
-        dto.setParticipationUid(UUID.randomUUID());
 
         when(questParticipationRepository.findQuestParticipationByUid(any())).thenReturn(Optional.empty());
 
-        assertThrows(ParticipationNotFoundException.class, () -> questParticipationService.updateQuestParticipation(dto));
+        assertThrows(ParticipationNotFoundException.class, () -> questParticipationService.updateQuestParticipation(participation.getUid(), dto));
     }
 
     @Test
     void updateQuestParticipation_throwsInvalidAccess() {
         UpdateQuestParticipationRequestDto dto = new UpdateQuestParticipationRequestDto();
-        dto.setParticipationUid(participation.getUid());
 
         when(questParticipationRepository.findQuestParticipationByUid(participation.getUid()))
                 .thenReturn(Optional.of(participation));
@@ -217,7 +236,7 @@ class QuestParticipationServiceTest {
         securityUtilsMock.when(() -> SecurityUtils.validateUserAccessByUsername(user.getUsername()))
                 .thenThrow(new InvalidAccessException("Access Denied"));
 
-        assertThrows(InvalidAccessException.class, () -> questParticipationService.updateQuestParticipation(dto));
+        assertThrows(InvalidAccessException.class, () -> questParticipationService.updateQuestParticipation(participation.getUid(), dto));
 
         verify(questParticipationRepository, never()).save(any());
     }
@@ -234,7 +253,7 @@ class QuestParticipationServiceTest {
         securityUtilsMock.when(() -> SecurityUtils.validateUserAccessByUsername(user.getUsername()))
                 .thenAnswer(invocation -> null);
 
-        questParticipationService.deleteParticipationByUid(partUid);
+        questParticipationService.cancelParticipationByUid(partUid);
 
         assertEquals(QuestStatus.CANCELLED, participation.getQuestStatus());
         verify(questParticipationRepository).save(participation);
@@ -258,7 +277,7 @@ class QuestParticipationServiceTest {
         securityUtilsMock.when(SecurityUtils::getCurrentUsername)
                 .thenReturn("someUsernameDifferentByPerformer");
 
-        questParticipationService.deleteParticipationByUid(partUid);
+        questParticipationService.cancelParticipationByUid(partUid);
         assertEquals(QuestStatus.REJECTED, participation.getQuestStatus());
         verify(questParticipationRepository).save(participation);
     }

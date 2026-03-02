@@ -10,9 +10,13 @@ public class ErrorMessages {
     public static final String USERNAME_ALREADY_EXISTS_MSG = "Username already exists in DB!";
     public static final String EMAIL_ALREADY_EXISTS_MSG = "Email already exists in DB!";
 
+    public static final String BADGE_NOT_FOUND_MSG = "Badge not found";
+    public static final String BADGE_NOT_SAVED_MSG = "Failed to save badge";
+
     public static final String MEDIA_NOT_FOUND_MSG = "Media not found";
     public static final String MEDIA_NOT_UPLOADED_TO_SERVER_MSG = "Media not uploaded to server storage";
     public static final String MEDIA_NOT_DELETED_FROM_SERVER_MSG = "Media not deleted from server storage";
+    public static final String MEDIA_NOT_UPLOADED_TO_SUBMISSION_MSG = "Media not uploaded to submission";
     public static final String DIRECTORY_NOT_CREATED_MSG = "Could not initialize storage location";
 
     public static final String QUEST_NOT_FOUND_MSG = "Quest not found in  database by id";

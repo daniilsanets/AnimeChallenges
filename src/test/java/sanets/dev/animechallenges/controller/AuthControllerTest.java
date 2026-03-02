@@ -46,7 +46,7 @@ class AuthControllerTest {
         String requestJson = objectMapper.writeValueAsString(requestDto);
 
         mockMvc.perform(
-                post("/api/auth/signup")
+                post("/api/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson)
 
@@ -75,7 +75,7 @@ class AuthControllerTest {
         when(authService.login(username, password)).thenReturn(mockResponseDto);
 
         mockMvc.perform(
-                post("/api/auth/login")
+                post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson)
         )

@@ -17,5 +17,5 @@ public class QuestResponseDto {
     private UUID badgeUid;
     private Integer maxAttempts;
     private UUID creatorUid;
-    private Boolean isActive;
+    private Boolean active;
 }

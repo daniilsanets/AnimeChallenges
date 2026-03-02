@@ -16,12 +16,12 @@ public class QuestSpecification {
         };
     }
 
-    public static Specification<Quest> isActive(Boolean isActive) {
+    public static Specification<Quest> isActive(Boolean active) {
         return (root, query, cb) -> {
-            if (isActive == null) {
+            if (active == null) {
                 return null;
             }
-            return cb.equal(root.get("isActive"), isActive);
+            return cb.equal(root.get("active"), active);
         };
     }
 

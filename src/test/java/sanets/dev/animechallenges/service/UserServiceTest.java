@@ -79,7 +79,7 @@ class UserServiceTest {
 
         try (MockedStatic<SecurityUtils> securityUtilsMock = Mockito.mockStatic(SecurityUtils.class)) {
 
-            UserProfileResponseDto result = userService.updateUserProfileByUId(currentUser.getUid(), dto);
+            UserProfileResponseDto result = userService.updateUserProfileByUId( dto);
 
             assertNotNull(result);
 
@@ -102,7 +102,7 @@ class UserServiceTest {
                     .thenThrow(new InvalidAccessException("Access denied"));
 
             assertThrows(InvalidAccessException.class,
-                    () -> userService.updateUserProfileByUId(targetUser.getUid(), new UpdateUserProfileRequestDto()));
+                    () -> userService.updateUserProfileByUId( new UpdateUserProfileRequestDto()));
 
             verify(userRepository, never()).save(any());
         }

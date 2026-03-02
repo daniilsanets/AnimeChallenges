@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import sanets.dev.animechallenges.dto.media.MediaResponseDto;
 import sanets.dev.animechallenges.exception.media.MediaNotDeletedException;
 import sanets.dev.animechallenges.exception.media.MediaNotFoundException;
 import sanets.dev.animechallenges.exception.media.MediaNotUploadedException;
@@ -63,7 +64,15 @@ public class MediaService {
                 .orElseThrow(() -> new MediaNotFoundException(MEDIA_NOT_FOUND_MSG));
     }
 
-    public void delete(UUID mediaId) throws MediaNotFoundException{
+    public MediaResponseDto getMediaDtoByUid(UUID mediaUid) {
+        return mediaMapper.toMediaResponseDto(getMediaByUid(mediaUid));
+    }
+
+    public MediaResponseDto getMediaDtoByMedia(Media media) {
+        return mediaMapper.toMediaResponseDto(media);
+    }
+
+    public void delete(UUID mediaId) {
         log.debug("Invoke delete media {}", mediaId);
         Media media = getMediaByUid(mediaId);
         log.debug("The media was found");
@@ -89,7 +98,7 @@ public class MediaService {
         }
     }
 
-    public Media upload(MultipartFile file) throws MediaNotUploadedException{
+    public Media upload(MultipartFile file){
         String storageKey = createStorageKey(file);
         Path filePath = saveFile(file, storageKey);
 
@@ -112,13 +121,17 @@ public class MediaService {
         return media;
     }
 
+    public MediaResponseDto uploadMedia(MultipartFile multipartFile) {
+        return getMediaDtoByMedia(upload(multipartFile));
+    }
+
     private String createStorageKey(MultipartFile file){
         String originalFileName = file.getOriginalFilename();
         String extension = originalFileName != null && originalFileName.contains(".")
                 ? originalFileName.substring(originalFileName.lastIndexOf('.'))
                 : "";
         log.debug("Create storage key");
-        return UUID.randomUUID().toString() + extension;
+        return UUID.randomUUID() + extension;
     }
 
     private Path saveFile(MultipartFile file, String storageKey){

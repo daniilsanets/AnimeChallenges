@@ -3,6 +3,7 @@ package sanets.dev.animechallenges.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sanets.dev.animechallenges.dto.user.AdminUserProfileResponseDto;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
@@ -10,6 +11,7 @@ import sanets.dev.animechallenges.mapper.UserMapper;
 import sanets.dev.animechallenges.model.media.Media;
 import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.UserRepository;
+import sanets.dev.animechallenges.security.SecurityUtils;
 
 import java.util.UUID;
 
@@ -25,10 +27,13 @@ public class UserService {
     private final UserMapper userMapper;
     private final MediaService mediaService;
 
-    public UserProfileResponseDto updateUserProfileByUId(UUID userToUpdateUid, UpdateUserProfileRequestDto userProfileRequestDto){
-        User userToUpdate = getUserByUid(userToUpdateUid);
-
-        validateUserAccessByUsername(userToUpdate.getUsername());
+    /**
+     * Updated user profile
+     * @param userProfileRequestDto
+     * @return <code>UserProfileResponseDto</code>
+     */
+    public UserProfileResponseDto updateUserProfileByUId(UpdateUserProfileRequestDto userProfileRequestDto){
+        User userToUpdate = getUserByUid(SecurityUtils.getCurrentUserUid());
 
         userMapper.updateUserProfileFromDto(userProfileRequestDto, userToUpdate);
 
@@ -45,6 +50,11 @@ public class UserService {
     public UserProfileResponseDto getUserProfileByUid(UUID userUid) {
         User user = getUserByUid(userUid);
         return userMapper.toUserProfileResponseDto(user);
+    }
+
+    /// Only for admins
+    public AdminUserProfileResponseDto getExtendedUserProfileByUid(UUID userUid) {
+        return userMapper.toAdminUserProfileResponseDto(getUserByUid(userUid));
     }
 
     public void deleteUserByUid(UUID userUid) {
