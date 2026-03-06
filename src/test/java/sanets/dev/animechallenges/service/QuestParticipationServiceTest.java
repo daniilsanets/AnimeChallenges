@@ -81,7 +81,7 @@ class QuestParticipationServiceTest {
         quest = Quest.builder()
                 .uid(UUID.randomUUID())
                 .creator(creator)
-                .isActive(true)
+                .active(true)
                 .build();
 
         participation = QuestParticipation.builder()
@@ -141,7 +141,7 @@ class QuestParticipationServiceTest {
     @Test
     void createQuestParticipation_throwsQuestNotAvailable() {
         securityUtilsMock.when(SecurityUtils::getCurrentUserUid).thenReturn(user.getUid());
-        quest.setIsActive(false);
+        quest.setActive(false);
         CreateParticipationRequestDto dto = new CreateParticipationRequestDto();
         dto.setQuestUid(quest.getUid());
 

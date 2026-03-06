@@ -74,7 +74,7 @@ class QuestServiceTest {
                 .difficulty(QuestsDifficulty.MEDIUM)
                 .rewardPoints(10)
                 .badge(badge)
-                .isActive(true)
+                .active(true)
                 .build();
     }
 
@@ -120,7 +120,7 @@ class QuestServiceTest {
         questService.deleteQuest(quest.getUid());
 
         mockedCall.close();
-        assertFalse(quest.getIsActive());
+        assertFalse(quest.getActive());
         verify(questRepository).save(quest);
     }
 }

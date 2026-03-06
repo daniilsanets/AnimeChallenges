@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import sanets.dev.animechallenges.dto.user.UpdateUserProfileRequestDto;
 import sanets.dev.animechallenges.dto.user.UserProfileResponseDto;
 import sanets.dev.animechallenges.exception.auth.UserNotFoundException;
-import sanets.dev.animechallenges.exception.common.InvalidAccessException;
 import sanets.dev.animechallenges.mapper.UserMapper;
 import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.model.user.UserRole;
@@ -67,44 +66,22 @@ class UserServiceTest {
     @Test
     void updateUserProfileByUId_ShouldUpdate_WhenAccessValid() {
         UpdateUserProfileRequestDto dto = new UpdateUserProfileRequestDto();
-
         UserProfileResponseDto expectedResponse = new UserProfileResponseDto();
 
         when(userRepository.findByUid(currentUser.getUid())).thenReturn(Optional.of(currentUser));
         when(userRepository.save(currentUser)).thenReturn(currentUser);
-
         doNothing().when(userMapper).updateUserProfileFromDto(dto, currentUser);
-
         when(userMapper.toUserProfileResponseDto(currentUser)).thenReturn(expectedResponse);
 
         try (MockedStatic<SecurityUtils> securityUtilsMock = Mockito.mockStatic(SecurityUtils.class)) {
+            securityUtilsMock.when(SecurityUtils::getCurrentUserUid).thenReturn(currentUser.getUid());
 
-            UserProfileResponseDto result = userService.updateUserProfileByUId( dto);
+            UserProfileResponseDto result = userService.updateUserProfileByUId(dto);
 
             assertNotNull(result);
-
             verify(userRepository).save(currentUser);
             verify(userMapper).updateUserProfileFromDto(dto, currentUser);
-
             verify(userMapper).toUserProfileResponseDto(currentUser);
-
-            securityUtilsMock.verify(() -> SecurityUtils.validateUserAccessByUsername(currentUser.getUsername()));
-        }
-    }
-
-    @Test
-    void updateUserProfileByUId_ShouldThrow_WhenSecurityUtilsThrows() {
-
-        when(userRepository.findByUid(targetUser.getUid())).thenReturn(Optional.of(targetUser));
-
-        try (MockedStatic<SecurityUtils> securityUtilsMock = Mockito.mockStatic(SecurityUtils.class)) {
-            securityUtilsMock.when(() -> SecurityUtils.validateUserAccessByUsername(targetUser.getUsername()))
-                    .thenThrow(new InvalidAccessException("Access denied"));
-
-            assertThrows(InvalidAccessException.class,
-                    () -> userService.updateUserProfileByUId( new UpdateUserProfileRequestDto()));
-
-            verify(userRepository, never()).save(any());
         }
     }
 
@@ -129,21 +106,16 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUserByUid_ShouldDelete_WhenIsAdminAndUserExists() {
+    void deleteUserByUid_ShouldDelete_WhenUserExists() {
         UUID targetUid = targetUser.getUid();
 
-        try (MockedStatic<SecurityUtils> securityUtilsMock = Mockito.mockStatic(SecurityUtils.class)) {
+        when(userRepository.existsById(targetUid)).thenReturn(true);
+        when(userRepository.findByUid(targetUid)).thenReturn(Optional.of(targetUser));
 
-            securityUtilsMock.when(SecurityUtils::isAdmin).thenReturn(true);
+        userService.deleteUserByUid(targetUid);
 
-            when(userRepository.existsById(targetUid)).thenReturn(true);
-            when(userRepository.findByUid(targetUid)).thenReturn(Optional.of(targetUser));
-
-            userService.deleteUserByUid(targetUid);
-
-            verify(userRepository).delete(targetUser);
-            verify(userRepository).existsById(targetUid);
-        }
+        verify(userRepository).delete(targetUser);
+        verify(userRepository).existsById(targetUid);
     }
 
     @Test

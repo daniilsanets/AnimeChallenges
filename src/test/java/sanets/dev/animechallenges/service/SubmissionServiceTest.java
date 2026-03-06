@@ -6,11 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.mock.web.MockMultipartFile;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
 import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
 import sanets.dev.animechallenges.exception.submission.SubmissionIsFinalizedException;
-import sanets.dev.animechallenges.exception.submission.SubmissionMediaLimitExceededException;
 import sanets.dev.animechallenges.mapper.SubmissionMapper;
 import sanets.dev.animechallenges.model.media.Media;
 import sanets.dev.animechallenges.model.quest.QuestParticipation;
@@ -20,18 +20,17 @@ import sanets.dev.animechallenges.model.user.User;
 import sanets.dev.animechallenges.repository.SubmissionMediaRepository;
 import sanets.dev.animechallenges.repository.SubmissionRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +45,13 @@ class SubmissionServiceTest {
     private QuestParticipationService questParticipationService;
     @Mock
     private SubmissionMapper submissionMapper;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private SubmissionMediaService submissionMediaService;
+
+    @Mock
+    private MediaService mediaService;
 
     @InjectMocks
     private SubmissionService submissionService;
@@ -67,6 +73,7 @@ class SubmissionServiceTest {
         submission = Submission.builder()
                 .uid(UUID.randomUUID())
                 .submissionStatus(SubmissionStatus.PENDING)
+                .questParticipation(questParticipation)
                 .build();
 
     }
@@ -77,7 +84,7 @@ class SubmissionServiceTest {
 
         CreateSubmissionRequestDto dto = new CreateSubmissionRequestDto();
         dto.setParticipationUid(participationUid);
-        dto.setMedia(List.of());
+        dto.setMultipartFiles(List.of());
         dto.setDescription("Cool description");
         dto.setNotes("Cool notes");
 
@@ -88,6 +95,9 @@ class SubmissionServiceTest {
                 .thenReturn(questParticipation);
 
         when(submissionMapper.toSubmission(dto, questParticipation))
+                .thenReturn(submission);
+
+        when(submissionRepository.save(submission))
                 .thenReturn(submission);
 
         when(submissionMapper.toSubmissionResponseDto(submission))
@@ -107,85 +117,47 @@ class SubmissionServiceTest {
     void createSubmission_withMedia_shouldSaveSubmissionAndMedia() {
         UUID participationUid = questParticipation.getUid();
 
-        Media media1 = new Media();
-        media1.setMimeType("image/png");
-
-        Media media2 = new Media();
-        media2.setMimeType("image/jpeg");
+        MockMultipartFile file1 = new MockMultipartFile(
+                "file", "file1.png", "image/png", "content1".getBytes()
+        );
+        MockMultipartFile file2 = new MockMultipartFile(
+                "file", "file2.jpg", "image/jpeg", "content2".getBytes()
+        );
 
         CreateSubmissionRequestDto dto = new CreateSubmissionRequestDto();
         dto.setParticipationUid(participationUid);
         dto.setDescription("desc");
         dto.setNotes("notes");
-        dto.setMedia(List.of(media1, media2));
+        dto.setMultipartFiles(List.of(file1, file2));
 
         SubmissionResponseDto responseDto = new SubmissionResponseDto();
         responseDto.setUid(submission.getUid());
 
+        Media media1 = new Media();
+        Media media2 = new Media();
+
         when(questParticipationService.getQuestParticipationByUid(participationUid))
                 .thenReturn(questParticipation);
-
         when(submissionMapper.toSubmission(dto, questParticipation))
                 .thenReturn(submission);
-
+        when(submissionRepository.save(submission))
+                .thenReturn(submission);
         when(submissionMapper.toSubmissionResponseDto(submission))
                 .thenReturn(responseDto);
 
-        when(submissionMediaRepository.countBySubmissionUid(submission.getUid()))
-                .thenReturn(0L);
-
-        ReflectionTestUtils.setField(
-                submissionService,
-                "MAX_MEDIA_COULD_BE_ADDED",
-                5
-        );
+        when(mediaService.upload(file1)).thenReturn(media1);
+        when(mediaService.upload(file2)).thenReturn(media2);
 
         SubmissionResponseDto result = submissionService.createSubmission(dto);
 
         assertNotNull(result);
+        assertEquals(submission.getUid(), result.getUid());
 
         verify(submissionRepository).save(submission);
-        verify(submissionMediaRepository).countBySubmissionUid(submission.getUid());
-
-        verify(submissionMediaRepository, times(2))
-                .save(any());
-    }
-
-    @Test
-    void createSubmission_withMedia_shouldThrowSubmissionMediaLimitExceededException() {
-        UUID participationUid = questParticipation.getUid();
-
-        List<Media> mediaList = new ArrayList<>();
-
-        IntStream.range(0, 3).forEach(i -> {
-            mediaList.add(new Media());
-        });
-
-        CreateSubmissionRequestDto dto = new CreateSubmissionRequestDto();
-        dto.setParticipationUid(participationUid);
-        dto.setDescription("desc");
-        dto.setNotes("notes");
-        dto.setMedia(mediaList);
-
-        when(questParticipationService.getQuestParticipationByUid(participationUid))
-                .thenReturn(questParticipation);
-
-        when(submissionMapper.toSubmission(dto, questParticipation))
-                .thenReturn(submission);
-
-        when(submissionMediaRepository.countBySubmissionUid(submission.getUid()))
-                .thenReturn(4L);
-
-        ReflectionTestUtils.setField(
-                submissionService,
-                "MAX_MEDIA_COULD_BE_ADDED",
-                5
+        verify(submissionMediaService).attachToSubmission(
+                eq(submission),
+                argThat(list -> list.size() == 2 && list.containsAll(List.of(media1, media2)))
         );
-
-        assertThrows(SubmissionMediaLimitExceededException.class, () -> submissionService.createSubmission(dto));
-        verify(submissionRepository).save(submission);
-
-        verify(submissionMediaRepository, never()).save(any());
     }
 
     @Test
@@ -223,12 +195,11 @@ class SubmissionServiceTest {
     }
 
     @Test
-    void approvedSubmission_shouldSetApprovedAndReturnDto_whenItsSuccessfully(){
+    void approvedSubmission_shouldSetApprovedAndReturnDto_whenItsSuccessfully() {
         submission.setSubmissionStatus(SubmissionStatus.PENDING);
 
         when(submissionRepository.findByUid(submission.getUid()))
                 .thenReturn(Optional.of(submission));
-
         when(submissionMapper.toSubmissionResponseDto(submission))
                 .thenReturn(new SubmissionResponseDto());
 
@@ -238,6 +209,7 @@ class SubmissionServiceTest {
         assertNotNull(submission.getApprovedAt());
 
         verify(submissionRepository).saveAndFlush(submission);
+        verify(submissionMapper).toSubmissionResponseDto(submission);
     }
 
     @Test

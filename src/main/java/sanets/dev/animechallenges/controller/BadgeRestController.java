@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import sanets.dev.animechallenges.controller.abstraction.BadgeController;
 import sanets.dev.animechallenges.dto.badge.BadgeFilterDto;
 import sanets.dev.animechallenges.dto.badge.BadgeRequestDto;
 import sanets.dev.animechallenges.dto.badge.BadgeResponseDto;
@@ -28,45 +29,59 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/badges")
-public class BadgeController {
+public class BadgeRestController implements BadgeController {
 
     private final BadgeService badgeService;
 
     @PostMapping
+    @Override
     public Page<BadgeResponseDto> getBadges(BadgeFilterDto filter, Pageable pageable) {
         return badgeService.getBadgesWithFilter(filter, pageable);
     }
 
+
     @GetMapping("/{uid}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Override
     public BadgeResponseDto getBadgeByUid(@PathVariable UUID uid) {
         return badgeService.getBadgeDtoByUid(uid);
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
     @ResponseStatus(HttpStatus.CREATED)
-    public void createBadge(@RequestPart("badge") @Valid BadgeRequestDto badgeRequestDto,
-                            @RequestPart("file") MultipartFile file) {
+    @Override
+    public void createBadge(
+            @RequestPart("badge") @Valid BadgeRequestDto badgeRequestDto,
+            @RequestPart("file") MultipartFile file
+    ) {
         badgeService.createBadge(badgeRequestDto, file);
     }
 
     @DeleteMapping("/{uid}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
     public void archiveBadge(@PathVariable UUID uid) {
         badgeService.archiveBadge(uid);
     }
 
     @GetMapping("/user/{userId}")
+    @Override
     public List<BadgeResponseDto> getUserBadges(@PathVariable UUID userId) {
         return badgeService.getUserBadgesByUserUid(userId);
     }
 
+    //todo: id paramets take from path
+    //ex:/assign/users/{userUid}/badges/{badgeUid}
     @PostMapping("/assign")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
-    public boolean assignBadgeToUser(@RequestParam UUID userUid, @RequestParam UUID badgeUid) {
+    @Override
+    public Boolean assignBadgeToUser(
+            @RequestParam UUID userUid,
+            @RequestParam UUID badgeUid
+    ) {
         Badge badge = badgeService.getBadgeByUid(badgeUid);
         return badgeService.saveBadgeToUser(userUid, badge);
     }

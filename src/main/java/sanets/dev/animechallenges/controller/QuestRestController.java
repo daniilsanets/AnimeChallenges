@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sanets.dev.animechallenges.controller.abstraction.QuestController;
 import sanets.dev.animechallenges.dto.quest.CreateQuestRequestDto;
 import sanets.dev.animechallenges.dto.quest.QuestFilterDto;
 import sanets.dev.animechallenges.dto.quest.QuestResponseDto;
@@ -27,18 +27,20 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/quests")
 @RequiredArgsConstructor
-public class QuestController {
+public class QuestRestController implements QuestController {
 
     private final QuestService questService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public void createQuest(@RequestBody @Valid CreateQuestRequestDto dto) {
         questService.createQuest(dto);
     }
 
-    @PostMapping
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
+    @Override
     public Page<QuestResponseDto> getQuests(
             QuestFilterDto filterDto,
             @PageableDefault(size = 20) Pageable pageable
@@ -48,6 +50,7 @@ public class QuestController {
 
     @PatchMapping("/{uid}")
     @ResponseStatus(HttpStatus.OK)
+    @Override
     public void updateQuest(
             @PathVariable UUID uid,
             @RequestBody @Valid UpdateQuestRequestDto dto
@@ -57,6 +60,7 @@ public class QuestController {
 
     @DeleteMapping("/{uid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
     public void deleteQuest(@PathVariable UUID uid) {
         questService.deleteQuest(uid);
     }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sanets.dev.animechallenges.controller.abstraction.SubmissionController;
 import sanets.dev.animechallenges.dto.submission.CreateSubmissionRequestDto;
 import sanets.dev.animechallenges.dto.submission.SubmissionResponseDto;
 import sanets.dev.animechallenges.service.SubmissionService;
@@ -22,12 +23,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/submissions")
 @RequiredArgsConstructor
-public class SubmissionController {
+public class SubmissionRestController implements SubmissionController {
 
     private final SubmissionService submissionService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public SubmissionResponseDto createSubmission(@Valid @ModelAttribute CreateSubmissionRequestDto dto) {
         return submissionService.createSubmission(dto);
     }
@@ -35,6 +37,7 @@ public class SubmissionController {
     @PatchMapping("/admin/{uid}/approve")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Override
     public SubmissionResponseDto approveSubmission(@PathVariable UUID uid){
         return submissionService.approveSubmissionByUid(uid);
     }
@@ -42,6 +45,7 @@ public class SubmissionController {
     @PatchMapping("/admin/{uid}/reject")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Override
     public SubmissionResponseDto rejectSubmission(@PathVariable UUID uid){
         return submissionService.rejectSubmissionByUid(uid);
     }
@@ -49,6 +53,7 @@ public class SubmissionController {
     @GetMapping("/admin/{uid}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Override
     public SubmissionResponseDto getSubmission(@PathVariable UUID uid){
         return submissionService.getSubmissionResponseDto(uid);
     }

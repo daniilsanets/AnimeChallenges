@@ -115,7 +115,7 @@ public class QuestParticipationService {
             throw new AlreadyParticipatingException(ALREADY_PARTICIPATING_MSG);
         }
 
-        if (quest.isActive() == false){
+        if (!quest.getActive()){
             throw new QuestNotAvailable(QUEST_NOT_AVAILABLE_MSG);
         }
 

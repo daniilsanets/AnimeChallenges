@@ -16,7 +16,6 @@ import sanets.dev.animechallenges.repository.SubmissionMediaRepository;
 
 import java.util.List;
 
-import static sanets.dev.animechallenges.exception.ErrorMessages.MEDIA_NOT_UPLOADED_TO_SERVER_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.MEDIA_NOT_UPLOADED_TO_SUBMISSION_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.SUBMISSION_MEDIA_LIMIT_EXCEEDED_MSG;
 import static sanets.dev.animechallenges.exception.ErrorMessages.SUBMISSION_NOT_AVAILABLE_MSG;
