@@ -27,10 +27,15 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/*/auth/**").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/api/*/auth/**"
+                        ).permitAll()
                         .requestMatchers("/api/**").authenticated()
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN") /// I think I'll remove this 'cause I will hang the @PreAuthorize
-                    .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 );
 
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

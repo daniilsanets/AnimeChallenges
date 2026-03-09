@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sanets.dev.animechallenges.controller.abstraction.QuestParticipationController;
 import sanets.dev.animechallenges.dto.participation.CreateParticipationRequestDto;
 import sanets.dev.animechallenges.dto.participation.QuestParticipationResponseDto;
 import sanets.dev.animechallenges.dto.participation.UpdateQuestParticipationRequestDto;
@@ -25,16 +26,18 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/participations")
 @RequiredArgsConstructor
-public class QuestParticipationController {
+public class QuestParticipationRestController implements QuestParticipationController {
     private final QuestParticipationService questParticipationService;
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public QuestParticipationResponseDto createParticipation(@RequestBody CreateParticipationRequestDto createParticipationRequestDto) {
         return questParticipationService.createQuestParticipation(createParticipationRequestDto);
     }
 
     @GetMapping("/{uid}")
+    @Override
     public QuestParticipationResponseDto getParticipationByUid(@PathVariable UUID uid) {
         return questParticipationService.getQuestParticipationResponseByUid(uid);
     }
@@ -42,6 +45,7 @@ public class QuestParticipationController {
     @PostMapping("/admin/users/{userUid}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Override
     public Page<QuestParticipationResponseDto> getAllParticipationsByUserUid(
             @PathVariable UUID userUid,
             @PageableDefault(20) Pageable pageable) {
@@ -51,6 +55,7 @@ public class QuestParticipationController {
     @PatchMapping("/admin/{uid}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
+    @Override
     public QuestParticipationResponseDto updateQuestParticipationByUid(
             @PathVariable UUID uid,
             @RequestBody UpdateQuestParticipationRequestDto dto) {
@@ -60,6 +65,7 @@ public class QuestParticipationController {
     @DeleteMapping("/admin/{uid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
+    @Override
     public void cancelParticipationByUid(@PathVariable UUID uid) {
         questParticipationService.cancelParticipationByUid(uid);
     }

@@ -18,7 +18,7 @@ import sanets.dev.animechallenges.model.submission.SubmissionMedia;
 public interface SubmissionMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {
-        "participationUid", "media",  "uid" , "performer", "quest", "questStatus", "startedAt", "score"
+        "participationUid", "multipartFiles",  "uid" , "performer", "quest", "questStatus", "startedAt", "score"
     })
     @Mapping(source = "participation", target = "questParticipation")
     @Mapping(target = "uid", ignore = true)
